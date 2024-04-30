@@ -22,7 +22,7 @@ func Call(bot shared.Bot, context shared.MessageContext, arguments []string, con
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	person := getRandomPerson()
 
-	numWords := rand.Intn(15) + 20
+	numWords := rand.Intn(15) + 10
 	c := NewChain(1)
 	// build the chain
 	// c.Build(strings.NewReader(TextSources[person]))
@@ -39,6 +39,10 @@ func Call(bot shared.Bot, context shared.MessageContext, arguments []string, con
 	}
 
 	generatedLine := c.Generate(numWords, arguments)
+
+	if generatedLine == "" {
+		return nil
+	}
 
 	finalString := fmt.Sprintf("%s: %s", person, generatedLine)
 
@@ -88,8 +92,6 @@ func (c *Chain) Generate(n int, inputWords []string) string {
 	if len(inputWords) > 0 {
 		p.Shift(inputWords[rand.Intn(len(inputWords))])
 
-		words = append(words, p.String())
-
 		if _, ok := c.chain[p.String()]; !ok {
 			for k := range c.chain {
 				p.Shift(k)
@@ -119,6 +121,11 @@ func (c *Chain) Generate(n int, inputWords []string) string {
 		words = append(words, next)
 		p.Shift(next)
 	}
+
+	if len(words) < 2 {
+		return ""
+	}
+
 	return strings.Join(words, " ")
 }
 
