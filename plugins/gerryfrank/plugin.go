@@ -9,11 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/shared"
 	"github.com/mb-14/gomarkov"
 )
 
-func Setup(bot shared.Bot) {
+func Setup(bot bot.Bot) {
 	bot.Register("gerryfrank", Call)
 
 	// gerryChain := gomarkov.NewChain(1)
@@ -65,7 +66,7 @@ func Setup(bot shared.Bot) {
 // }
 
 // Call generates a random sentence in the style of Gerry, Frank, or the audience.
-func Call(bot shared.Bot, context shared.MessageContext, arguments []string, config shared.Config) error {
+func Call(bot bot.Bot, context bot.MessageContext, arguments []string, config shared.Config) error {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	person := getRandomPerson()
 

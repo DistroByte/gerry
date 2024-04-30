@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"git.dbyte.xyz/distro/gerry/shared"
+	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/symbols"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/shlex"
@@ -90,11 +90,11 @@ func LoadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, sour
 	plugin.name = pkg
 	plugin.bot = &Bot{discordConn, &plugin}
 
-	if setup, _ := getFunc[shared.PluginSetupFunc](pluginter, pkg, "Setup"); setup != nil {
+	if setup, _ := getFunc[bot.PluginSetupFunc](pluginter, pkg, "Setup"); setup != nil {
 		setup(plugin.bot)
 	}
 
-	if run, _ := getFunc[shared.PluginRunFunc](pluginter, pkg, "Run"); run != nil {
+	if run, _ := getFunc[bot.PluginRunFunc](pluginter, pkg, "Run"); run != nil {
 		plugin.stopCh = make(chan struct{})
 		go run(plugin.bot, plugin.stopCh)
 	}

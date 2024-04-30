@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/shared"
 	"github.com/bwmarrin/discordgo"
 	"gopkg.in/fsnotify.v1"
@@ -90,7 +91,7 @@ func main() {
 		if rand.Intn(100) < 2 {
 			plugin := PluginFromCommand(plugins, "gerryfrank")
 			if plugin != nil {
-				context := shared.MessageContext{
+				context := bot.MessageContext{
 					Sender:  m.Author.Username,
 					Target:  m.ChannelID,
 					Source:  "discord",
@@ -136,7 +137,7 @@ func main() {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("commands are: %v", strings.Join(PluginCommands(plugins), ", ")))
 			return
 		}
-		context := shared.MessageContext{
+		context := bot.MessageContext{
 			Sender:  m.Author.Username,
 			Target:  m.ChannelID,
 			Source:  "discord",
@@ -177,8 +178,8 @@ func main() {
 // interface, a map of commands, and a stop channel.
 type plugin struct {
 	name     string
-	bot      shared.Bot
-	commands map[string]shared.PluginCallFunc
+	bot      bot.Bot
+	commands map[string]bot.PluginCallFunc
 	stopCh   chan struct{}
 }
 
@@ -189,7 +190,7 @@ type Bot struct {
 }
 
 // Send sends a message to the given recipient. It is platform agnostic.
-func (c *Bot) Send(context shared.MessageContext, message string) {
+func (c *Bot) Send(context bot.MessageContext, message string) {
 	log.Printf("sending message to %s - %q: %q", context.Source, context.Target, message)
 	if context.Source == "discord" {
 		_, err := c.ChannelMessageSend(context.Target, message)
@@ -202,9 +203,9 @@ func (c *Bot) Send(context shared.MessageContext, message string) {
 // Register registers a command with the bot. The command is the string that
 // triggers the command, and the function is the function that is called when
 // the command is triggered.
-func (c *Bot) Register(command string, f shared.PluginCallFunc) {
+func (c *Bot) Register(command string, f bot.PluginCallFunc) {
 	if c.commands == nil {
-		c.commands = map[string]shared.PluginCallFunc{}
+		c.commands = map[string]bot.PluginCallFunc{}
 	}
 	c.commands[command] = f
 }
