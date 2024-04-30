@@ -7,6 +7,6 @@ func Setup(bot shared.Bot) {
 }
 
 func Call(bot shared.Bot, context shared.MessageContext, arguments []string, config shared.Config) error {
-	bot.Send(context.Source, context.Target, "pong")
+	bot.Send(context, "pong")
 	return nil
 }

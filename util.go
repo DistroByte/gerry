@@ -36,7 +36,7 @@ func LoadPlugins(discordConn *discordgo.Session, pluginPaths []string, plugins m
 		if err != nil {
 			return fmt.Errorf("read plugin source: %w", err)
 		}
-		if err := loadPlugin(discordConn, plugins, source); err != nil {
+		if err := LoadPlugin(discordConn, plugins, source); err != nil {
 			return fmt.Errorf("load plugin %q: %w", path, err)
 		}
 	}
@@ -45,9 +45,9 @@ func LoadPlugins(discordConn *discordgo.Session, pluginPaths []string, plugins m
 
 var plugmu sync.Mutex
 
-// loadPlugin loads a single plugin from the given source. It will replace the
+// LoadPlugin loads a single plugin from the given source. It will replace the
 // existing plugin if it already exists.
-func loadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, source []byte) error {
+func LoadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, source []byte) error {
 	plugmu.Lock()
 	defer plugmu.Unlock()
 
@@ -123,7 +123,7 @@ func AddWatchers(discordConn *discordgo.Session, watcher *fsnotify.Watcher, plug
 					if err != nil {
 						log.Printf("error reading file: %v", err)
 					}
-					if err := loadPlugin(discordConn, plugins, source); err != nil {
+					if err := LoadPlugin(discordConn, plugins, source); err != nil {
 						log.Printf("error loading plugin: %v", err)
 					}
 				}

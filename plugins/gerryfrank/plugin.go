@@ -46,7 +46,7 @@ func Call(bot shared.Bot, context shared.MessageContext, arguments []string, con
 
 	finalString := fmt.Sprintf("%s: %s", person, generatedLine)
 
-	bot.Send(context.Source, context.Target, finalString)
+	bot.Send(context, finalString)
 	return nil
 }
 

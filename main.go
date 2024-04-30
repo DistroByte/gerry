@@ -102,6 +102,29 @@ func main() {
 			return
 		}
 
+		if command == "load" {
+			if len(arguments) == 0 {
+				s.ChannelMessageSend(m.ChannelID, "please provide a plugin name")
+				return
+			}
+
+			pluginName := arguments[0]
+			pluginPath := filepath.Join(conf.PluginPath, pluginName, "plugin.go")
+			source, err := os.ReadFile(pluginPath)
+			if err != nil {
+				s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("error reading plugin: %v", err))
+				return
+			}
+
+			if err := LoadPlugin(discord, plugins, source); err != nil {
+				s.ChannelMessageSend(m.ChannelID, err.Error())
+				return
+			}
+
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("loaded plugin %q", pluginName))
+			return
+		}
+
 		plugin := PluginFromCommand(plugins, command)
 
 		if plugin == nil {
@@ -161,10 +184,10 @@ type Bot struct {
 }
 
 // Send sends a message to the given recipient. It is platform agnostic.
-func (c *Bot) Send(platform string, to string, message string) {
-	log.Printf("sending message to %s - %q: %q", platform, to, message)
-	if platform == "discord" {
-		_, err := c.ChannelMessageSend(to, message)
+func (c *Bot) Send(context shared.MessageContext, message string) {
+	log.Printf("sending message to %s - %q: %q", context.Source, context.Target, message)
+	if context.Source == "discord" {
+		_, err := c.ChannelMessageSend(context.Target, message)
 		if err != nil {
 			log.Printf("error sending message: %v", err)
 		}
