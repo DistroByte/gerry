@@ -1,1 +1,628 @@
-{"":["It"],"...actual":["person."],"...so":["you're"],"A":["FALSE","LIFE?","CAUSE,"],"ABOUT":["WOMEN."],"AHEAD":["AND"],"AHEAD,":["FIND"],"ALL":["THE"],"AND":["THIS,","LIVE!","HELP"],"ARE":["POOR"],"AUDITIONING":["FOR"],"And":["I'm","if"],"Angela's":["Ashes"],"Ashes":["And"],"BECAUSE...":["I'M"],"BEEN":["MARRIED"],"CARMODY":["is"],"CARMODY,":["THERESA","THERESA"],"CARMODY.":["Just"],"CAUSE,":["there"],"Carmody,":["it's"],"DO":["SOMETHING!"],"DO,":["I"],"DON'T":["MIND","KNOW","YOU","OBSESS"],"FALSE":["NAME."],"FIND":["A"],"FOR":["THIS"],"FOREVER":["BECAUSE..."],"For":["the"],"GO":["AHEAD","AHEAD,","AND"],"GOING":["LAST"],"HAVE":["A"],"HELP":["THE"],"HUNDREDS":["OF"],"How":["old","old"],"I":["don't","didn't","didn't","met","didn't","met","DO,","LOVE","LIKE","LOVE","MADE","DON'T"],"I'M":["MAD","MARRIED","INFATUATED"],"I'VE":["BEEN"],"I'm":["sure"],"I-":["you've"],"IF":["YOU"],"IN":["LIMERICK."],"INFATUATED":["WITH"],"IS":["GOING"],"Ireland":["and"],"Ireland,":["south"],"It":["must"],"It's":["a","a"],"Jim":["Kemmy!","Kemmy!"],"Just":["a"],"KNOW":["WHY"],"Kemmy!":["Jim","...actual"],"LAST":["FOREVER"],"LIFE?":["GO"],"LIKE":["WOMEN"],"LIMERICK,":["DON'T"],"LIMERICK.":["GO"],"LIVE!":["DO"],"LOVE":["WOMEN","WOMEN."],"MAD":["ABOUT"],"MADE":["UP"],"MARRIED":["THREE","TO"],"ME":["ALL"],"ME.":["DON'T"],"MIND":["I"],"MOVIE":["It's"],"MY":["WIFE"],"NAME.":["I"],"NOW":["IS"],"No":["he"],"OBSESS":["WITH"],"OBSESSED":["WITH"],"OF":["LIMERICK,","PEOPLE"],"ONE":["I'M"],"PEOPLE":["IN","SHOWED"],"POOR":["PEOPLE","OF"],"PROTECT":["MY"],"SHOWED":["UP,"],"SO":["OBSESSED"],"SOMETHING!":["GO"],"TERRIBLE":["MOVIE"],"THE":["ONE","POOR","TIME!"],"THERE":["ARE"],"THERESA":["CARMODY.","CARMODY,","CARMODY,","CARMODY"],"THEY":["AUDITIONING"],"THIS":["TERRIBLE"],"THIS,":["THE"],"THREE":["TIMES,"],"TIME!":["You're"],"TIMES,":["AND"],"TO":["NOW","PROTECT"],"Teresa":["Carmody,"],"The":["young"],"There":["was","was"],"UP":["A"],"UP,":["then"],"WERE":["THEY"],"WHY":["YOU'RE","WERE"],"WIFE":["I"],"WITH":["WOMEN","ME.","ME"],"WOMEN":["IF","I","TO"],"WOMEN.":["I'M","I'VE"],"Why":["are"],"YOU":["DON'T","HAVE"],"YOU'RE":["SO"],"You're":["there,"],"a":["made","minute","made","liar.","city","few","squabble,","squabble"],"about":["it"],"and":["you're","the","nobody's"],"anything":["about"],"are":["you","you","you?","a"],"are,":["there","there","THERE"],"be":["one","in"],"before":["he","he","he"],"book":["and"],"brought":["their"],"by":["the"],"calls,":["for"],"cast":["sent"],"casting":["calls,"],"children":["to"],"city":["in"],"didn't":["discuss","meet","know-"],"died-":["I"],"died.":["Jim"],"died...":["...so"],"discuss":["various"],"don't":["know"],"enough":["time"],"few":["people"],"finished,":["THERESA"],"for":["the"],"had":["enough"],"hated":["the"],"hated,":["if"],"he":["wasn't.","died-","died...","died."],"her":["name"],"him":["til","just","just"],"if":["they","they"],"in":["a","Ireland,","limerick,","Angela's"],"is":["a"],"it":["There"],"it's":["a"],"just":["before","before","before"],"know":["anything","her"],"know-":["I"],"lady,":["you"],"liar.":["I"],"limerick,":["HUNDREDS"],"made":["up","up"],"me":["And"],"me?":["How"],"meet":["him"],"met":["him","him"],"minute":["we're"],"movie":["in"],"movie,":["WHY"],"must":["be"],"name":["The","Why"],"name!":["There"],"never":["know"],"no":["Teresa","proo-"],"nobody's":["interested"],"not":["finished,"],"now!":["No"],"obsessed":["with","with"],"of":["Ireland"],"old":["are","are"],"one":["sided"],"out":["casting"],"people":["that,"],"person.":["I"],"proo-":["THERESA"],"reason":["that"],"same":["reason"],"schools":["that"],"sent":["out"],"sided":["I"],"so":["obsessed"],"south":["of"],"squabble":["and"],"squabble,":["It's"],"sure":["there"],"that":["I","I-"],"that,":["when"],"the":["way?","same","movie","book","movie,"],"their":["children"],"then":["they"],"there":["are,","are,","are,","are"],"there,":["you're"],"they":["cast","brought","hated,","hated"],"til":["just"],"time":["now!"],"to":["be"],"up":["name!","name"],"various":["schools"],"was":["no","no"],"wasn't.":["I"],"way?":["How"],"we're":["not"],"when":["they"],"will":["never"],"with":["me?","me"],"you":["will","so","by"],"you're":["a","in","obsessed"],"you've":["had"],"you?":["For"],"young":["lady,"]}
+{
+  "": [
+    "it"
+  ],
+  "...actual": [
+    "person."
+  ],
+  "...so": [
+    "you're"
+  ],
+  "ahead": [
+    "and"
+  ],
+  "ahead,": [
+    "find"
+  ],
+  "all": [
+    "the"
+  ],
+  "are": [
+    "poor",
+    "you",
+    "you",
+    "you?",
+    "a"
+  ],
+  "auditioning": [
+    "for"
+  ],
+  "and": [
+    "i'm",
+    "if",
+    "this,",
+    "live!",
+    "help",
+    "you're",
+    "the",
+    "nobody's"
+  ],
+  "angela's": [
+    "ashes"
+  ],
+  "ashes": [
+    "and"
+  ],
+  "because...": [
+    "i'm"
+  ],
+  "been": [
+    "married"
+  ],
+  "carmody": [
+    "is",
+    "theresa",
+    "theresa"
+  ],
+  "carmody.": [
+    "just"
+  ],
+  "cause,": [
+    "there"
+  ],
+  "carmody,": [
+    "it's"
+  ],
+  "do": [
+    "something!"
+  ],
+  "do,": [
+    "i"
+  ],
+  "don't": [
+    "mind",
+    "know",
+    "you",
+    "obsess",
+    "know"
+  ],
+  "false": [
+    "name."
+  ],
+  "find": [
+    "a"
+  ],
+  "forever": [
+    "because..."
+  ],
+  "go": [
+    "ahead",
+    "ahead,",
+    "and"
+  ],
+  "going": [
+    "last"
+  ],
+  "have": [
+    "a"
+  ],
+  "help": [
+    "the"
+  ],
+  "hundreds": [
+    "of"
+  ],
+  "how": [
+    "old",
+    "old"
+  ],
+  "i": [
+    "don't",
+    "didn't",
+    "didn't",
+    "met",
+    "didn't",
+    "met",
+    "do,",
+    "love",
+    "like",
+    "love",
+    "made",
+    "don't"
+  ],
+  "i've": [
+    "been"
+  ],
+  "i'm": [
+    "sure",
+    "mad",
+    "married",
+    "infatuated"
+  ],
+  "i-": [
+    "you've"
+  ],
+  "in": [
+    "limerick.",
+    "a",
+    "ireland,",
+    "limerick,",
+    "angela's"
+  ],
+  "infatuated": [
+    "with"
+  ],
+  "ireland": [
+    "and"
+  ],
+  "ireland,": [
+    "south"
+  ],
+  "it": [
+    "must",
+    "there"
+  ],
+  "jim": [
+    "kemmy!",
+    "kemmy!"
+  ],
+  "just": [
+    "a",
+    "before",
+    "before",
+    "before"
+  ],
+  "kemmy!": [
+    "jim",
+    "...actual"
+  ],
+  "last": [
+    "forever"
+  ],
+  "life?": [
+    "go"
+  ],
+  "like": [
+    "women"
+  ],
+  "limerick.": [
+    "go"
+  ],
+  "live!": [
+    "do"
+  ],
+  "love": [
+    "women",
+    "women."
+  ],
+  "mad": [
+    "about"
+  ],
+  "made": [
+    "up",
+    "up"
+  ],
+  "married": [
+    "three",
+    "to"
+  ],
+  "me": [
+    "and"
+  ],
+  "me.": [
+    "don't"
+  ],
+  "mind": [
+    "i"
+  ],
+  "movie": [
+    "in"
+  ],
+  "my": [
+    "wife"
+  ],
+  "name.": [
+    "i"
+  ],
+  "now": [
+    "is"
+  ],
+  "no": [
+    "teresa",
+    "proo-"
+  ],
+  "obsess": [
+    "with"
+  ],
+  "obsessed": [
+    "with",
+    "with"
+  ],
+  "of": [
+    "ireland"
+  ],
+  "one": [
+    "sided"
+  ],
+  "people": [
+    "that,"
+  ],
+  "poor": [
+    "people",
+    "of"
+  ],
+  "protect": [
+    "my"
+  ],
+  "showed": [
+    "up,"
+  ],
+  "so": [
+    "obsessed"
+  ],
+  "something!": [
+    "go"
+  ],
+  "terrible": [
+    "movie"
+  ],
+  "the": [
+    "way?",
+    "same",
+    "movie",
+    "book",
+    "movie,"
+  ],
+  "there": [
+    "are,",
+    "are,",
+    "are,",
+    "are"
+  ],
+  "theresa": [
+    "carmody.",
+    "carmody,",
+    "carmody,",
+    "carmody"
+  ],
+  "they": [
+    "cast",
+    "brought",
+    "hated,",
+    "hated"
+  ],
+  "this": [
+    "terrible"
+  ],
+  "this,": [
+    "the"
+  ],
+  "three": [
+    "times,"
+  ],
+  "time!": [
+    "you're"
+  ],
+  "times,": [
+    "and"
+  ],
+  "to": [
+    "be"
+  ],
+  "teresa": [
+    "carmody,"
+  ],
+  "up": [
+    "name!",
+    "name"
+  ],
+  "up,": [
+    "then"
+  ],
+  "were": [
+    "they"
+  ],
+  "why": [
+    "you're",
+    "were",
+    "are"
+  ],
+  "wife": [
+    "i"
+  ],
+  "women": [
+    "if",
+    "i",
+    "to"
+  ],
+  "women.": [
+    "i'm",
+    "i've"
+  ],
+  "you": [
+    "don't",
+    "have",
+    "will",
+    "so",
+    "by"
+  ],
+  "you're": [
+    "there,",
+    "a",
+    "in",
+    "obsessed",
+    "so"
+  ],
+  "a": [
+    "made",
+    "minute",
+    "made",
+    "liar.",
+    "city",
+    "few",
+    "squabble,",
+    "squabble",
+    "false",
+    "life?",
+    "cause,"
+  ],
+  "about": [
+    "it",
+    "women."
+  ],
+  "anything": [
+    "about"
+  ],
+  "are,": [
+    "there",
+    "there",
+    "there"
+  ],
+  "be": [
+    "one",
+    "in"
+  ],
+  "before": [
+    "he",
+    "he",
+    "he"
+  ],
+  "book": [
+    "and"
+  ],
+  "brought": [
+    "their"
+  ],
+  "by": [
+    "the"
+  ],
+  "calls,": [
+    "for"
+  ],
+  "cast": [
+    "sent"
+  ],
+  "casting": [
+    "calls,"
+  ],
+  "children": [
+    "to"
+  ],
+  "city": [
+    "in"
+  ],
+  "didn't": [
+    "discuss",
+    "meet",
+    "know-"
+  ],
+  "died-": [
+    "i"
+  ],
+  "died.": [
+    "jim"
+  ],
+  "died...": [
+    "...so"
+  ],
+  "discuss": [
+    "various"
+  ],
+  "enough": [
+    "time"
+  ],
+  "few": [
+    "people"
+  ],
+  "finished,": [
+    "theresa"
+  ],
+  "for": [
+    "the",
+    "the",
+    "this"
+  ],
+  "had": [
+    "enough"
+  ],
+  "hated": [
+    "the"
+  ],
+  "hated,": [
+    "if"
+  ],
+  "he": [
+    "wasn't.",
+    "died-",
+    "died...",
+    "died."
+  ],
+  "her": [
+    "name"
+  ],
+  "him": [
+    "til",
+    "just",
+    "just"
+  ],
+  "if": [
+    "they",
+    "they",
+    "you"
+  ],
+  "is": [
+    "a",
+    "going"
+  ],
+  "it's": [
+    "a",
+    "a",
+    "a"
+  ],
+  "know": [
+    "anything",
+    "her",
+    "why"
+  ],
+  "know-": [
+    "i"
+  ],
+  "lady,": [
+    "you"
+  ],
+  "liar.": [
+    "i"
+  ],
+  "limerick,": [
+    "hundreds",
+    "don't"
+  ],
+  "me?": [
+    "how"
+  ],
+  "meet": [
+    "him"
+  ],
+  "met": [
+    "him",
+    "him"
+  ],
+  "minute": [
+    "we're"
+  ],
+  "movie,": [
+    "why"
+  ],
+  "must": [
+    "be"
+  ],
+  "name": [
+    "the",
+    "why"
+  ],
+  "name!": [
+    "there"
+  ],
+  "never": [
+    "know"
+  ],
+  "nobody's": [
+    "interested"
+  ],
+  "not": [
+    "finished,"
+  ],
+  "now!": [
+    "no"
+  ],
+  "old": [
+    "are",
+    "are"
+  ],
+  "out": [
+    "casting"
+  ],
+  "person.": [
+    "i"
+  ],
+  "proo-": [
+    "theresa"
+  ],
+  "reason": [
+    "that"
+  ],
+  "same": [
+    "reason"
+  ],
+  "schools": [
+    "that"
+  ],
+  "sent": [
+    "out"
+  ],
+  "sided": [
+    "i"
+  ],
+  "south": [
+    "of"
+  ],
+  "squabble": [
+    "and"
+  ],
+  "squabble,": [
+    "it's"
+  ],
+  "sure": [
+    "there"
+  ],
+  "that": [
+    "i",
+    "i-"
+  ],
+  "that,": [
+    "when"
+  ],
+  "their": [
+    "children"
+  ],
+  "then": [
+    "they"
+  ],
+  "there,": [
+    "you're"
+  ],
+  "til": [
+    "just"
+  ],
+  "time": [
+    "now!"
+  ],
+  "various": [
+    "schools"
+  ],
+  "was": [
+    "no",
+    "no"
+  ],
+  "wasn't.": [
+    "i"
+  ],
+  "way?": [
+    "how"
+  ],
+  "we're": [
+    "not"
+  ],
+  "when": [
+    "they"
+  ],
+  "will": [
+    "never"
+  ],
+  "with": [
+    "me?",
+    "me",
+    "women",
+    "me.",
+    "me"
+  ],
+  "you've": [
+    "had"
+  ],
+  "you?": [
+    "for"
+  ],
+  "young": [
+    "lady,"
+  ]
+}

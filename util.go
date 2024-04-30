@@ -6,10 +6,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sync"
 
 	"git.dbyte.xyz/distro/gerry/shared"
 	"git.dbyte.xyz/distro/gerry/symbols"
+	"github.com/bwmarrin/discordgo"
+	"github.com/google/shlex"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"gopkg.in/fsnotify.v1"
@@ -26,13 +30,13 @@ func MustEnv(key string) string {
 }
 
 // LoadPlugins loads all plugins from the given paths.
-func LoadPlugins(pluginPaths []string, plugins map[string]*plugin) error {
+func LoadPlugins(discordConn *discordgo.Session, pluginPaths []string, plugins map[string]*plugin) error {
 	for _, path := range pluginPaths {
 		source, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("read plugin source: %w", err)
 		}
-		if err := loadPlugin(plugins, source); err != nil {
+		if err := loadPlugin(discordConn, plugins, source); err != nil {
 			return fmt.Errorf("load plugin %q: %w", path, err)
 		}
 	}
@@ -43,7 +47,7 @@ var plugmu sync.Mutex
 
 // loadPlugin loads a single plugin from the given source. It will replace the
 // existing plugin if it already exists.
-func loadPlugin(plugins map[string]*plugin, source []byte) error {
+func loadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, source []byte) error {
 	plugmu.Lock()
 	defer plugmu.Unlock()
 
@@ -74,7 +78,7 @@ func loadPlugin(plugins map[string]*plugin, source []byte) error {
 
 	var plugin plugin
 	plugin.name = pkg
-	plugin.bot = &Bot{&plugin}
+	plugin.bot = &Bot{discordConn, &plugin}
 
 	if setup, _ := getFunc[shared.PluginSetupFunc](pluginter, pkg, "Setup"); setup != nil {
 		setup(plugin.bot)
@@ -108,7 +112,7 @@ func getFunc[T any](i *interp.Interpreter, pkg string, key string) (T, error) {
 
 // AddWatchers adds watchers for the given plugin paths. This allows for live
 // reloading of plugins.
-func AddWatchers(watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPaths []string) {
+func AddWatchers(discordConn *discordgo.Session, watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPaths []string) {
 	go func() {
 		for {
 			select {
@@ -119,7 +123,7 @@ func AddWatchers(watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPa
 					if err != nil {
 						log.Printf("error reading file: %v", err)
 					}
-					if err := loadPlugin(plugins, source); err != nil {
+					if err := loadPlugin(discordConn, plugins, source); err != nil {
 						log.Printf("error loading plugin: %v", err)
 					}
 				}
@@ -134,4 +138,37 @@ func AddWatchers(watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPa
 			log.Panicf("error adding watcher for %q: %v", path, err)
 		}
 	}
+}
+
+func PluginFromCommand(plugins map[string]*plugin, command string) *plugin {
+	for _, p := range plugins {
+		if _, ok := p.commands[command]; ok {
+			return p
+		}
+	}
+	return nil
+}
+
+func PluginCommands(plugins map[string]*plugin) []string {
+	var r []string
+	for _, p := range plugins {
+		for command := range p.commands {
+			r = append(r, command)
+		}
+	}
+	sort.Strings(r)
+	return r
+}
+
+func ParseCommand(message string) (string, []string) {
+	parts, _ := shlex.Split(message)
+	if len(parts) == 0 {
+		return "", nil
+	}
+
+	command, ok := strings.CutPrefix(parts[0], "!")
+	if !ok {
+		return "", nil
+	}
+	return command, parts[1:]
 }

@@ -3,12 +3,13 @@ package shared
 type Bot interface {
 	Register(command string, f PluginCallFunc)
 
-	Send(target string, message string)
+	Send(platform string, target string, message string)
 }
 
 type MessageContext struct {
 	Sender  string
 	Target  string
+	Source  string
 	Message string
 }
 

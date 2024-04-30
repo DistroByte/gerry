@@ -1,33 +1,52 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	"git.dbyte.xyz/distro/gerry/shared"
+	"github.com/bwmarrin/discordgo"
 	"gopkg.in/fsnotify.v1"
 )
 
 var (
-	// cfgToken       = mustEnv("GERRY_TOKEN")
+	cfgToken       = MustEnv("GERRY_TOKEN")
 	cfgPluginsPath = MustEnv("GERRY_PLUGINS_PATH")
-	// cfgLogsPath    = mustEnv("GERRY_LOGS_PATH")
+	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
 )
 
 func main() {
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
+	// log date and time
 	log.SetFlags(0)
 
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	println("Starting Gerry...")
+
+	// create discord client
+	discord, err := discordgo.New("Bot " + cfgToken)
+	if err != nil {
+		log.Panicf("error creating discord client: %v", err)
+	}
+
+	// set intents
+	discord.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsDirectMessages
+
+	// open websocket connection
+	log.Println("opening discord connection")
+	if err := discord.Open(); err != nil {
+		log.Panicf("error opening connection: %v", err)
+	}
 
 	conf := shared.Config{
 		PluginPath: cfgPluginsPath,
@@ -41,7 +60,7 @@ func main() {
 
 	// load plugins
 	plugins := map[string]*plugin{}
-	if err := LoadPlugins(pluginPaths, plugins); err != nil {
+	if err := LoadPlugins(discord, pluginPaths, plugins); err != nil {
 		log.Panicf("error loading plugins: %v", err)
 	}
 
@@ -51,14 +70,69 @@ func main() {
 		log.Panicf("error adding watcher for plugins dir")
 	}
 
-	AddWatchers(watcher, plugins, pluginPaths)
+	// add watchers for plugins
+	AddWatchers(discord, watcher, plugins, pluginPaths)
+
+	// add message handler function
+	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
+
+		args := strings.Split(strings.ToLower(m.Content), " ")
+
+		// small chance to send a message from the gerryfrank plugin
+		if rand.Intn(100) < 2 {
+			plugin := PluginFromCommand(plugins, "gerryfrank")
+			if plugin != nil {
+				context := shared.MessageContext{
+					Sender:  m.Author.Username,
+					Target:  m.ChannelID,
+					Source:  "discord",
+					Message: m.Content,
+				}
+				if err := plugin.commands["gerryfrank"](plugin.bot, context, args, conf); err != nil {
+					s.ChannelMessageSend(m.ChannelID, err.Error())
+				}
+			}
+		}
+
+		command, arguments := ParseCommand(m.Content)
+		if command == "" {
+			return
+		}
+
+		plugin := PluginFromCommand(plugins, command)
+
+		if plugin == nil {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("commands are: %v", strings.Join(PluginCommands(plugins), ", ")))
+			return
+		}
+		context := shared.MessageContext{
+			Sender:  m.Author.Username,
+			Target:  m.ChannelID,
+			Source:  "discord",
+			Message: m.Content,
+		}
+
+		if err := plugin.commands[command](plugin.bot, context, arguments, conf); err != nil {
+			s.ChannelMessageSend(m.ChannelID, err.Error())
+			return
+		}
+	})
 
 	var wg sync.WaitGroup
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		<-exit
+		log.Println("shutting down...")
+
+		log.Println("closing discord connection")
+		if err := discord.Close(); err != nil { // close discord connection
+			log.Printf("error closing connection: %v", err)
+		}
+
 		for _, plug := range plugins { // stop plugins
 			if plug.stopCh != nil {
 				close(plug.stopCh)
@@ -66,9 +140,9 @@ func main() {
 		}
 	}()
 
+	// wait for all go routines to finish
 	wg.Wait()
 	log.Println("shutdown complete")
-	// <-exit
 }
 
 // plugin represents a plugin. It contains the name of the plugin, the bot
@@ -82,12 +156,19 @@ type plugin struct {
 
 // Bot represents a bot. It contains a pointer to the plugin.
 type Bot struct {
+	*discordgo.Session
 	*plugin
 }
 
 // Send sends a message to the given recipient. It is platform agnostic.
-func (c *Bot) Send(to string, message string) {
-	log.Printf("sending message to %q: %q", to, message)
+func (c *Bot) Send(platform string, to string, message string) {
+	log.Printf("sending message to %s - %q: %q", platform, to, message)
+	if platform == "discord" {
+		_, err := c.ChannelMessageSend(to, message)
+		if err != nil {
+			log.Printf("error sending message: %v", err)
+		}
+	}
 }
 
 // Register registers a command with the bot. The command is the string that

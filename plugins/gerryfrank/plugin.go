@@ -38,9 +38,11 @@ func Call(bot shared.Bot, context shared.MessageContext, arguments []string, con
 		return err
 	}
 
-	generatedLine := c.Generate(numWords)
+	generatedLine := c.Generate(numWords, arguments)
 
-	bot.Send(person, generatedLine)
+	finalString := fmt.Sprintf("%s: %s", person, generatedLine)
+
+	bot.Send(context.Source, context.Target, finalString)
 	return nil
 }
 
@@ -79,18 +81,29 @@ func (c *Chain) Build(r io.Reader) {
 }
 
 // Generate returns a string of at most n words generated from Chain.
-func (c *Chain) Generate(n int) string {
+func (c *Chain) Generate(n int, inputWords []string) string {
 	p := make(Prefix, c.prefixLen)
+	var words []string
 
-	// start with a random word from the chain
-	candidates := make([]string, 0, len(c.chain))
-	for k := range c.chain {
-		candidates = append(candidates, k)
+	if len(inputWords) > 0 {
+		p.Shift(inputWords[rand.Intn(len(inputWords))])
+
+		words = append(words, p.String())
+
+		if _, ok := c.chain[p.String()]; !ok {
+			for k := range c.chain {
+				p.Shift(k)
+				break
+			}
+		}
+
+	} else {
+		for k := range c.chain {
+			p.Shift(k)
+			break
+		}
 	}
 
-	p.Shift(candidates[rand.Intn(len(candidates))])
-
-	var words []string
 	for i := 0; i < n; i++ {
 		choices := c.chain[p.String()]
 		if len(choices) == 0 {
