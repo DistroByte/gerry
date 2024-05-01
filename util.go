@@ -14,6 +14,7 @@ import (
 	"git.dbyte.xyz/distro/gerry/symbols"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/shlex"
+	"github.com/joho/godotenv"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"gopkg.in/fsnotify.v1"
@@ -22,10 +23,19 @@ import (
 // MustEnv returns the value of the environment variable named by the key, or
 // logs a fatal error if the variable is not set.
 func MustEnv(key string) string {
-	if v, ok := os.LookupEnv(key); ok {
-		return v
+	// check os.env and .env file
+	envFile, _ := godotenv.Read(".env")
+	if envFile != nil {
+		if val, ok := envFile[key]; ok {
+			return val
+		}
 	}
-	log.Fatalf("please provide a %q", key)
+
+	if val, ok := os.LookupEnv(key); ok {
+		return val
+	}
+
+	log.Fatalf("environment variable %q is not set", key)
 	return ""
 }
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -18,8 +19,9 @@ import (
 )
 
 var (
-	cfgToken       = MustEnv("GERRY_TOKEN")
-	cfgPluginsPath = MustEnv("GERRY_PLUGINS_PATH")
+	cfgToken             = MustEnv("GERRY_TOKEN")
+	cfgPluginsPath       = MustEnv("GERRY_PLUGINS_PATH")
+	cfgWatcherEnabled, _ = strconv.ParseBool(MustEnv("GERRY_WATCHER_ENABLED"))
 	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
 )
 
@@ -71,7 +73,9 @@ func main() {
 	}
 
 	// add watchers for plugins
-	AddWatchers(discord, watcher, plugins, pluginPaths)
+	if cfgWatcherEnabled {
+		AddWatchers(discord, watcher, plugins, pluginPaths)
+	}
 
 	// add message handler function
 	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
