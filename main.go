@@ -74,6 +74,7 @@ func main() {
 
 	// add watchers for plugins
 	if cfgWatcherEnabled {
+		log.Println("watcher enabled")
 		AddWatchers(discord, watcher, plugins, pluginPaths)
 	}
 
