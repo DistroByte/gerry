@@ -17,7 +17,9 @@ func Setup(bot bot.Bot, _chain utils.MarkovChainImpl) {
 	chain = _chain
 	chain.LoadModel("./markovChain.json")
 	chain.LoadModel("./word_freq_map.json")
+}
 
+func Run(bot bot.Bot, stopCh <-chan struct{}) {
 	// At most we'll lose the last 4 seconds of markov history
 	discFlushTimer := time.NewTicker(5 * time.Second)
 	gerryGravityTimer := time.NewTicker(1 * time.Hour)
@@ -30,6 +32,9 @@ func Setup(bot bot.Bot, _chain utils.MarkovChainImpl) {
 				chain.Flush()
 			case <-gerryGravityTimer.C:
 				chain.LoadModel("./word_freq_map.json")
+			case <-stopCh:
+				discFlushTimer.Stop()
+				discFlushTimer.Stop()
 			}
 		}
 	}()
