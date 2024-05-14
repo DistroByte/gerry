@@ -123,14 +123,23 @@ func (mc *MarkovChainImpl) LoadModel(file string) {
 
 func loadModel(file string) (map[string]map[string]float64, error) {
 	var chain map[string]map[string]float64
-	data, err := os.ReadFile(file)
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := os.ReadFile(f.Name())
+
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(data, &chain)
 	if err != nil {
-		return nil, err
+		fmt.Println("Creating new database since none was found")
+		return map[string]map[string]float64{}, nil
 	}
 
 	return chain, nil

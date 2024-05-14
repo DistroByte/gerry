@@ -15,6 +15,7 @@ var chain utils.MarkovChainImpl
 func Setup(bot bot.Bot, _chain utils.MarkovChainImpl) {
 	bot.Register("gerryfrank", Call)
 	chain = _chain
+	
 	chain.LoadModel("./markovChain.json")
 	chain.LoadModel("./word_freq_map.json")
 }
