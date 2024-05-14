@@ -1,8 +1,6 @@
 package ping
 
 import (
-	"time"
-
 	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/shared"
 	"git.dbyte.xyz/distro/gerry/utils"
