@@ -37,8 +37,7 @@ func main() {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	println("Starting Gerry...")
 
-	chain := utils.NewMarkovChain()
-	chain.LoadModel()
+	var chain = utils.NewMarkovChain()
 
 	// create discord client
 	discord, err := discordgo.New("Bot " + cfgToken)

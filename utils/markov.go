@@ -11,6 +11,7 @@ type MarkovChain interface {
 	AddWordTransition(from string, to string)
 	AddWordTransitions(mappings map[string]string)
 	ChooseNextWord(word string)
+	Flush()
 }
 
 type MarkovChainImpl struct {
@@ -107,21 +108,32 @@ func (mc *MarkovChainImpl) ChooseFirstWord() string {
 	return keys[rand.IntN(len(keys))]
 }
 
-func (mc *MarkovChainImpl) LoadModel() error {
-	var chain map[string]map[string]float64
-	data, err := os.ReadFile("./word_freq_map.json")
+func (mc *MarkovChainImpl) LoadModel(file string) {
+	fmt.Printf("Training from file %s\n", file)
+	transitions, err := loadModel(file)
 	if err != nil {
-		return err
+		panic(err)
+	}
+	if mc.transitions == nil {
+		mc.transitions = transitions
+	} else {
+		mc.Merge(transitions)
+	}
+}
+
+func loadModel(file string) (map[string]map[string]float64, error) {
+	var chain map[string]map[string]float64
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
 	}
 
 	err = json.Unmarshal(data, &chain)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	mc.transitions = chain
-
-	return nil
+	return chain, nil
 }
 
 // You are a liar
@@ -134,6 +146,35 @@ func (mc *MarkovChainImpl) ImportMessage(message []string) {
 		transitions[message[i]] = message[i+1]
 	}
 	mc.AddWordTransitions(transitions)
+}
+
+func (mc MarkovChainImpl) Flush() {
+	fmt.Println("Flushing!")
+	data, err := json.Marshal(&mc.transitions)
+	if err != nil {
+		fmt.Printf("Error marshalling to JSON: %v\n", err)
+	}
+
+	err = os.WriteFile("markovChain.json", data, 0644)
+	if err != nil {
+		fmt.Printf("Error writing to file: %v\n", err)
+	}
+}
+
+func (mc *MarkovChainImpl) Merge(other map[string]map[string]float64) {
+	for word, transitions := range other {
+		if mc.transitions[word] == nil {
+			mc.transitions[word] = make(map[string]float64)
+		}
+		for otherWord, otherWeight := range transitions {
+			weight, exists := mc.transitions[word][otherWord]
+			if exists {
+				mc.transitions[word][otherWord] = (weight + otherWeight) / 2
+			} else {
+				mc.transitions[word][otherWord] = otherWeight
+			}
+		}
+	}
 }
 
 func NewMarkovChain() *MarkovChainImpl {
