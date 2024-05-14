@@ -1,6 +1,9 @@
 package bot
 
-import "git.dbyte.xyz/distro/gerry/shared"
+import (
+	"git.dbyte.xyz/distro/gerry/shared"
+	"git.dbyte.xyz/distro/gerry/utils"
+)
 
 type Bot interface {
 	Register(command string, f PluginCallFunc)
@@ -15,6 +18,6 @@ type MessageContext struct {
 	Message string
 }
 
-type PluginSetupFunc = func(bot Bot)
+type PluginSetupFunc = func(bot Bot, chain utils.MarkovChainImpl)
 type PluginCallFunc = func(bot Bot, context MessageContext, arguments []string, config shared.Config) error
 type PluginRunFunc = func(bot Bot, stop <-chan struct{})

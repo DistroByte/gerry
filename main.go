@@ -15,6 +15,7 @@ import (
 
 	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/shared"
+	"git.dbyte.xyz/distro/gerry/utils"
 	"github.com/bwmarrin/discordgo"
 	"gopkg.in/fsnotify.v1"
 )
@@ -35,6 +36,9 @@ func main() {
 
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	println("Starting Gerry...")
+
+	chain := utils.NewMarkovChain()
+	chain.LoadModel()
 
 	// create discord client
 	discord, err := discordgo.New("Bot " + cfgToken)
@@ -63,7 +67,7 @@ func main() {
 
 	// load plugins
 	plugins := map[string]*plugin{}
-	if err := LoadPlugins(discord, pluginPaths, plugins); err != nil {
+	if err := LoadPlugins(discord, pluginPaths, plugins, chain); err != nil {
 		log.Panicf("error loading plugins: %v", err)
 	}
 
@@ -76,7 +80,7 @@ func main() {
 	// add watchers for plugins
 	if cfgWatcherEnabled {
 		log.Println("watcher enabled")
-		AddWatchers(discord, watcher, plugins, pluginPaths)
+		AddWatchers(discord, watcher, plugins, pluginPaths, chain)
 	}
 
 	// add message handler function
@@ -105,6 +109,7 @@ func main() {
 
 		command, arguments := ParseCommand(m.Content)
 		if command == "" {
+			chain.ImportMessage(args)
 			return
 		}
 
@@ -122,7 +127,7 @@ func main() {
 				return
 			}
 
-			if err := LoadPlugin(discord, plugins, source); err != nil {
+			if err := LoadPlugin(discord, plugins, source, chain); err != nil {
 				s.ChannelMessageSend(m.ChannelID, err.Error())
 				return
 			}

@@ -18,3 +18,4 @@ func init() {
 
 //go:generate $GOPATH/bin/yaegi extract git.dbyte.xyz/distro/gerry/bot
 //go:generate $GOPATH/bin/yaegi extract git.dbyte.xyz/distro/gerry/shared
+//go:generate $GOPATH/bin/yaegi extract git.dbyte.xyz/distro/gerry/utils
