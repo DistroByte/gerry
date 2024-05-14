@@ -17,17 +17,19 @@ import (
 	"git.dbyte.xyz/distro/gerry/shared"
 	"git.dbyte.xyz/distro/gerry/utils"
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 	"gopkg.in/fsnotify.v1"
 )
 
-var (
-	cfgToken             = MustEnv("GERRY_TOKEN")
-	cfgPluginsPath       = MustEnv("GERRY_PLUGINS_PATH")
-	cfgWatcherEnabled, _ = strconv.ParseBool(MustEnv("GERRY_WATCHER_ENABLED"))
-	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
-)
-
 func main() {
+	godotenv.Load()
+
+	cfgToken := MustEnv("GERRY_TOKEN")
+	cfgPluginsPath := MustEnv("GERRY_PLUGINS_PATH")
+	cfgWatcherEnabled, _ := strconv.ParseBool(MustEnv("GERRY_WATCHER_ENABLED"))
+
+	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
+
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
@@ -90,7 +92,6 @@ func main() {
 
 		args := strings.Split(strings.ToLower(m.Content), " ")
 
-		// small chance to send a message from the gerryfrank plugin
 		if rand.Intn(100) < 2 {
 			plugin := PluginFromCommand(plugins, "gerryfrank")
 			if plugin != nil {

@@ -18,7 +18,7 @@ type MarkovChainImpl struct {
 	transitions map[string]map[string]float64
 }
 
-func (mc *MarkovChainImpl) AddWordTransition(from, to string) {
+func (mc *MarkovChainImpl) AddWordTransition(from string, to string) {
 	if mc.transitions[from] == nil {
 		mc.transitions[from] = make(map[string]float64)
 	} else {
@@ -187,5 +187,5 @@ func (mc *MarkovChainImpl) Merge(other map[string]map[string]float64) {
 }
 
 func NewMarkovChain() *MarkovChainImpl {
-	return &MarkovChainImpl{} // Return a pointer to MarkovChainImpl
+	return &MarkovChainImpl{map[string]map[string]float64{}} // Return a pointer to MarkovChainImpl
 }

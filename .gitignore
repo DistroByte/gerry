@@ -2,5 +2,5 @@ tmp/
 .env
 .vscode
 logs/.vscode/
-__debug_bin3879612375
+__debug_*
 markovChain.json
