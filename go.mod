@@ -8,7 +8,6 @@ require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/joho/godotenv v1.5.1
-	github.com/mb-14/gomarkov v0.0.0-20231120193207-9cbdc8df67a8
 	github.com/traefik/yaegi v0.16.1
 	gopkg.in/fsnotify.v1 v1.4.7
 )

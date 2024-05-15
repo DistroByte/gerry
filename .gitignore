@@ -1,3 +1,6 @@
 tmp/
 .env
-logs/
+.vscode
+logs/.vscode/
+__debug_*
+markovChain.json

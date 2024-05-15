@@ -10,8 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	"git.dbyte.xyz/distro/gerry/shared"
+	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/symbols"
+	"git.dbyte.xyz/distro/gerry/utils"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/shlex"
 	"github.com/joho/godotenv"
@@ -40,13 +41,13 @@ func MustEnv(key string) string {
 }
 
 // LoadPlugins loads all plugins from the given paths.
-func LoadPlugins(discordConn *discordgo.Session, pluginPaths []string, plugins map[string]*plugin) error {
+func LoadPlugins(discordConn *discordgo.Session, pluginPaths []string, plugins map[string]*plugin, chain *utils.MarkovChainImpl) error {
 	for _, path := range pluginPaths {
 		source, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("read plugin source: %w", err)
 		}
-		if err := LoadPlugin(discordConn, plugins, source); err != nil {
+		if err := LoadPlugin(discordConn, plugins, source, chain); err != nil {
 			return fmt.Errorf("load plugin %q: %w", path, err)
 		}
 	}
@@ -57,7 +58,7 @@ var plugmu sync.Mutex
 
 // LoadPlugin loads a single plugin from the given source. It will replace the
 // existing plugin if it already exists.
-func LoadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, source []byte) error {
+func LoadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, source []byte, chain *utils.MarkovChainImpl) error {
 	plugmu.Lock()
 	defer plugmu.Unlock()
 
@@ -90,11 +91,15 @@ func LoadPlugin(discordConn *discordgo.Session, plugins map[string]*plugin, sour
 	plugin.name = pkg
 	plugin.bot = &Bot{discordConn, &plugin}
 
-	if setup, _ := getFunc[shared.PluginSetupFunc](pluginter, pkg, "Setup"); setup != nil {
-		setup(plugin.bot)
+	setup, err := getFunc[bot.PluginSetupFunc](pluginter, pkg, "Setup")
+	if err != nil {
+		panic(err)
+	}
+	if setup != nil {
+		setup(plugin.bot, *chain)
 	}
 
-	if run, _ := getFunc[shared.PluginRunFunc](pluginter, pkg, "Run"); run != nil {
+	if run, _ := getFunc[bot.PluginRunFunc](pluginter, pkg, "Run"); run != nil {
 		plugin.stopCh = make(chan struct{})
 		go run(plugin.bot, plugin.stopCh)
 	}
@@ -122,7 +127,7 @@ func getFunc[T any](i *interp.Interpreter, pkg string, key string) (T, error) {
 
 // AddWatchers adds watchers for the given plugin paths. This allows for live
 // reloading of plugins.
-func AddWatchers(discordConn *discordgo.Session, watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPaths []string) {
+func AddWatchers(discordConn *discordgo.Session, watcher *fsnotify.Watcher, plugins map[string]*plugin, pluginPaths []string, chain *utils.MarkovChainImpl) {
 	go func() {
 		for {
 			select {
@@ -133,7 +138,7 @@ func AddWatchers(discordConn *discordgo.Session, watcher *fsnotify.Watcher, plug
 					if err != nil {
 						log.Printf("error reading file: %v", err)
 					}
-					if err := LoadPlugin(discordConn, plugins, source); err != nil {
+					if err := LoadPlugin(discordConn, plugins, source, chain); err != nil {
 						log.Printf("error loading plugin: %v", err)
 					}
 				}

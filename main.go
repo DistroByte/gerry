@@ -13,19 +13,23 @@ import (
 	"syscall"
 	"time"
 
+	"git.dbyte.xyz/distro/gerry/bot"
 	"git.dbyte.xyz/distro/gerry/shared"
+	"git.dbyte.xyz/distro/gerry/utils"
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 	"gopkg.in/fsnotify.v1"
 )
 
-var (
-	cfgToken             = MustEnv("GERRY_TOKEN")
-	cfgPluginsPath       = MustEnv("GERRY_PLUGINS_PATH")
-	cfgWatcherEnabled, _ = strconv.ParseBool(MustEnv("GERRY_WATCHER_ENABLED"))
-	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
-)
-
 func main() {
+	godotenv.Load()
+
+	cfgToken := MustEnv("GERRY_TOKEN")
+	cfgPluginsPath := MustEnv("GERRY_PLUGINS_PATH")
+	cfgWatcherEnabled, _ := strconv.ParseBool(MustEnv("GERRY_WATCHER_ENABLED"))
+
+	// cfgLogsPath    = MustEnv("GERRY_LOGS_PATH")
+
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
@@ -34,6 +38,8 @@ func main() {
 
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	println("Starting Gerry...")
+
+	var chain = utils.NewMarkovChain()
 
 	// create discord client
 	discord, err := discordgo.New("Bot " + cfgToken)
@@ -62,7 +68,7 @@ func main() {
 
 	// load plugins
 	plugins := map[string]*plugin{}
-	if err := LoadPlugins(discord, pluginPaths, plugins); err != nil {
+	if err := LoadPlugins(discord, pluginPaths, plugins, chain); err != nil {
 		log.Panicf("error loading plugins: %v", err)
 	}
 
@@ -75,7 +81,7 @@ func main() {
 	// add watchers for plugins
 	if cfgWatcherEnabled {
 		log.Println("watcher enabled")
-		AddWatchers(discord, watcher, plugins, pluginPaths)
+		AddWatchers(discord, watcher, plugins, pluginPaths, chain)
 	}
 
 	// add message handler function
@@ -86,11 +92,10 @@ func main() {
 
 		args := strings.Split(strings.ToLower(m.Content), " ")
 
-		// small chance to send a message from the gerryfrank plugin
 		if rand.Intn(100) < 2 {
 			plugin := PluginFromCommand(plugins, "gerryfrank")
 			if plugin != nil {
-				context := shared.MessageContext{
+				context := bot.MessageContext{
 					Sender:  m.Author.Username,
 					Target:  m.ChannelID,
 					Source:  "discord",
@@ -104,6 +109,7 @@ func main() {
 
 		command, arguments := ParseCommand(m.Content)
 		if command == "" {
+			chain.ImportMessage(args)
 			return
 		}
 
@@ -121,7 +127,7 @@ func main() {
 				return
 			}
 
-			if err := LoadPlugin(discord, plugins, source); err != nil {
+			if err := LoadPlugin(discord, plugins, source, chain); err != nil {
 				s.ChannelMessageSend(m.ChannelID, err.Error())
 				return
 			}
@@ -136,7 +142,7 @@ func main() {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("commands are: %v", strings.Join(PluginCommands(plugins), ", ")))
 			return
 		}
-		context := shared.MessageContext{
+		context := bot.MessageContext{
 			Sender:  m.Author.Username,
 			Target:  m.ChannelID,
 			Source:  "discord",
@@ -177,8 +183,8 @@ func main() {
 // interface, a map of commands, and a stop channel.
 type plugin struct {
 	name     string
-	bot      shared.Bot
-	commands map[string]shared.PluginCallFunc
+	bot      bot.Bot
+	commands map[string]bot.PluginCallFunc
 	stopCh   chan struct{}
 }
 
@@ -189,7 +195,7 @@ type Bot struct {
 }
 
 // Send sends a message to the given recipient. It is platform agnostic.
-func (c *Bot) Send(context shared.MessageContext, message string) {
+func (c *Bot) Send(context bot.MessageContext, message string) {
 	log.Printf("sending message to %s - %q: %q", context.Source, context.Target, message)
 	if context.Source == "discord" {
 		_, err := c.ChannelMessageSend(context.Target, message)
@@ -202,9 +208,9 @@ func (c *Bot) Send(context shared.MessageContext, message string) {
 // Register registers a command with the bot. The command is the string that
 // triggers the command, and the function is the function that is called when
 // the command is triggered.
-func (c *Bot) Register(command string, f shared.PluginCallFunc) {
+func (c *Bot) Register(command string, f bot.PluginCallFunc) {
 	if c.commands == nil {
-		c.commands = map[string]shared.PluginCallFunc{}
+		c.commands = map[string]bot.PluginCallFunc{}
 	}
 	c.commands[command] = f
 }
