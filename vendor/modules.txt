@@ -1,6 +1,9 @@
 # github.com/bwmarrin/discordgo v0.28.1
 ## explicit; go 1.13
 github.com/bwmarrin/discordgo
+# github.com/golang/protobuf v1.3.1
+## explicit
+github.com/golang/protobuf/proto
 # github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 ## explicit; go 1.13
 github.com/google/shlex
@@ -19,3 +22,9 @@ golang.org/x/sys/cpu
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# layeh.com/gumble v0.0.0-20221205141517-d1df60a3cc14
+## explicit; go 1.12
+layeh.com/gumble/gumble
+layeh.com/gumble/gumble/MumbleProto
+layeh.com/gumble/gumble/varint
+layeh.com/gumble/gumbleutil

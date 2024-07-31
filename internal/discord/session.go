@@ -4,31 +4,32 @@ import (
 	"log/slog"
 
 	"github.com/DistroByte/gerry/internal/config"
+	"github.com/DistroByte/gerry/internal/handlers"
+	"github.com/DistroByte/gerry/internal/models"
 	"github.com/bwmarrin/discordgo"
-	"github.com/google/shlex"
 )
 
-var Session *discordgo.Session
+var DiscordSession *discordgo.Session
 
-func InitSession() {
+func InitDiscordSession() {
 	var err error
-	Session, err = discordgo.New("Bot " + config.GetDiscordToken())
+	DiscordSession, err = discordgo.New("Bot " + config.GetDiscordToken())
 	if err != nil {
 		slog.Error("failed to create discord session", "error", err)
 	}
 
-	Session.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildMessageTyping | discordgo.IntentsGuildVoiceStates
+	DiscordSession.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildMessageTyping | discordgo.IntentsGuildVoiceStates
 }
 
-func InitConnection() {
-	if err := Session.Open(); err != nil {
+func InitDiscordConnection() {
+	if err := DiscordSession.Open(); err != nil {
 		slog.Error("failed to create websocket connection to discord", "error", err)
 		return
 	}
 }
 
 func DiscordReadyHandler(s *discordgo.Session, event *discordgo.Ready) {
-	err := s.UpdateGameStatus(0, config.GetBotStatus())
+	err := s.UpdateListeningStatus(config.GetBotStatus())
 	if err != nil {
 		slog.Warn("failed to update game status", "error", err)
 	}
@@ -39,26 +40,14 @@ func DiscordMessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreat
 		return
 	}
 
-	slog.Info("processing command", "message", m.Content, "author", m.Author.Username, "channel", m.ChannelID)
-
-	prefix := config.GetBotPrefix()
-	guildID := SearchGuildByChannelID(m.ChannelID)
-	cmd, err := shlex.Split(m.Content)
-	if err != nil {
-		slog.Error("failed to split command", "error", err)
-		return
+	message := &models.Message{
+		Content: m.Content,
+		Author:  m.Author.Username,
+		Channel: m.ChannelID,
 	}
 
-	switch cmd[0] {
-	case prefix + "ping":
-		SendDiscordMessage(m.ChannelID, "Pong!")
-	case prefix + "echo":
-		SendDiscordMessage(m.ChannelID, cmd[1])
-	case prefix + "guild":
-		SendDiscordMessage(m.ChannelID, guildID)
-
-	default:
-		slog.Info("unknown command", "command", cmd[0])
-		return
+	response, err := handlers.HandleMessage(message)
+	if err == nil {
+		SendDiscordMessage(message.Channel, response)
 	}
 }

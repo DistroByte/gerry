@@ -5,13 +5,13 @@ import (
 )
 
 func SearchGuildByChannelID(textChannelID string) (guildID string) {
-	channel, _ := Session.Channel(textChannelID)
+	channel, _ := DiscordSession.Channel(textChannelID)
 	guildID = channel.GuildID
 	return guildID
 }
 
 func SendDiscordMessage(channelID string, message string) {
-	_, err := Session.ChannelMessageSend(channelID, message)
+	_, err := DiscordSession.ChannelMessageSend(channelID, message)
 	if err != nil {
 		slog.Error("failed to send message", "error", err)
 	}

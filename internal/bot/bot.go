@@ -9,6 +9,8 @@ import (
 
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/discord"
+	"github.com/DistroByte/gerry/internal/mumble"
+	"layeh.com/gumble/gumbleutil"
 )
 
 func Start() {
@@ -18,9 +20,19 @@ func Start() {
 		return
 	}
 
-	discord.InitSession()
+	if config.IsDiscordEnabled() {
+		discord.InitDiscordSession()
+	}
+
+	if config.IsMumbleEnabled() {
+		mumble.InitMumbleSession()
+	}
+
 	addHandlers()
-	discord.InitConnection()
+
+	if config.IsDiscordEnabled() {
+		discord.InitDiscordConnection()
+	}
 
 	slog.Info("Bot is running. Press CTRL+C to exit.", "environment", config.GetEnvironment())
 	sc := make(chan os.Signal, 1)
@@ -32,6 +44,15 @@ func addHandlers() {
 	// register hanlders as callbacks for various events
 
 	// discord
-	discord.Session.AddHandler(discord.DiscordReadyHandler)
-	discord.Session.AddHandler(discord.DiscordMessageCreateHandler)
+	if config.IsDiscordEnabled() {
+		discord.DiscordSession.AddHandler(discord.DiscordReadyHandler)
+		discord.DiscordSession.AddHandler(discord.DiscordMessageCreateHandler)
+	}
+	// mumble
+	if config.IsMumbleEnabled() {
+		mumble.MumbleSession.Config.Attach(gumbleutil.Listener{
+			Connect:     mumble.MumbleReadyHandler,
+			TextMessage: mumble.MumbleMessageCreateHandler,
+		})
+	}
 }

@@ -22,10 +22,12 @@ type configuration struct {
 }
 
 type discordConfig struct {
-	Token string `yaml:"token"`
+	Token  string `yaml:"token"`
+	Enable bool   `yaml:"enable"`
 }
 
 type mumbleConfig struct {
+	Enable   bool   `yaml:"enable"`
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	TLS      bool   `yaml:"tls"`
@@ -75,8 +77,16 @@ func GetBotStatus() string {
 	return config.Status
 }
 
+func IsDiscordEnabled() bool {
+	return config.Discord.Enable
+}
+
 func GetDiscordToken() string {
 	return config.Discord.Token
+}
+
+func IsMumbleEnabled() bool {
+	return config.Mumble.Enable
 }
 
 func GetMumbleHost() string {
@@ -85,6 +95,10 @@ func GetMumbleHost() string {
 
 func GetMumblePort() int {
 	return config.Mumble.Port
+}
+
+func GetMumbleUsername() string {
+	return config.Mumble.Username
 }
 
 func GetMumbleTLS() bool {
