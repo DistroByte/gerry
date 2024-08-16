@@ -11,6 +11,11 @@ func SearchGuildByChannelID(textChannelID string) (guildID string) {
 }
 
 func SendDiscordMessage(channelID string, message string) {
+	if message == "" {
+		slog.Error("cannot send an empty message")
+		return
+	}
+
 	_, err := DiscordSession.ChannelMessageSend(channelID, message)
 	if err != nil {
 		slog.Error("failed to send message", "error", err)

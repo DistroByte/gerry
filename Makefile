@@ -7,3 +7,6 @@ run:
 
 test:
 	@go test -v ./...
+
+watch:
+	@air
