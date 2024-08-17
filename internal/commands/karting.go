@@ -1,53 +1,88 @@
 package commands
 
 import (
-	"log/slog"
+	"sort"
 	"strconv"
 
-	"github.com/DistroByte/gerry/elo"
 	"github.com/DistroByte/gerry/internal/models"
+	"github.com/DistroByte/gerry/karting"
 )
 
-var K = 32.0
-var D = 400.0
-var ScoringFunctionBase = 1.0
-var LogBase = 10.0
+var league *karting.Karting
+
+func init() {
+	// Initialize the karting instance
+	league = karting.NewKarting()
+	league.Load()
+}
 
 func KartingCommand(args []string, message models.Message) string {
-	// calculate the new elo for each racer
-	elo := elo.NewMultiElo(K, D, ScoringFunctionBase, LogBase, nil)
+	if len(args) == 0 {
+		response := "Karting command requires arguments"
+		return response
+	}
 
-	// get the initial ratings
-	initialRatings := make([]float64, len(args))
-	for i, arg := range args {
-		rating, err := strconv.ParseFloat(arg, 64)
+	switch args[0] {
+
+	case "race":
+		if len(args) < 2 {
+			return "please provide a list of drivers"
+		}
+
+		var results []*karting.Result
+		for i, driver := range args[1:] {
+			results = append(results, &karting.Result{
+				Position: i + 1,
+				Driver:   &karting.Driver{Name: driver},
+			})
+		}
+
+		err := league.Race(results)
 		if err != nil {
-			slog.Error(err.Error())
-			return "Invalid rating"
-		}
-		initialRatings[i] = rating
-	}
-
-	// get the result order
-	resultOrder := make([]int, len(args))
-	for i := range resultOrder {
-		resultOrder[i] = i
-	}
-
-	// get the new ratings
-	newRatings := elo.GetNewRatings(initialRatings, resultOrder)
-
-	// format the response
-	response := "New ratings: "
-	for i, rating := range newRatings {
-		response += strconv.FormatFloat(rating, 'f', 2, 64)
-		if i < len(newRatings)-1 {
-			response += ", "
+			return err.Error()
 		}
 
+		return "race results recorded"
+
+	case "stats":
+		stats := league.Stats()
+		response := "Karting stats:\n"
+		for driver, stat := range stats {
+			response += strconv.Itoa(stat.ELO) + " | " + driver + " - " + strconv.Itoa(stat.TotalWins) + " wins out of " + strconv.Itoa(stat.TotalRaces) + " races\n"
+		}
+
+		return response
+
+	case "drivers":
+		response := "Drivers:\n"
+		// sort the drivers by ELO
+		sort.Slice(league.Drivers, func(i, j int) bool {
+			return league.Drivers[i].ELO > league.Drivers[j].ELO
+		})
+
+		for _, driver := range league.Drivers {
+			response += strconv.Itoa(driver.ELO) + " | " + driver.Name + "\n"
+		}
+
+		return response
+
+	case "register":
+		if len(args) < 2 {
+			return "Karting register command requires a driver name"
+		}
+
+		res, err := league.Register(args[1])
+		if err != nil {
+			return err.Error()
+		}
+		return res
+
+	case "reset":
+		league.Reset()
+		return "Karting stats have been reset"
 	}
 
-	// return the response
+	response := "Invalid karting command"
 
 	return response
 }

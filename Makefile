@@ -1,12 +1,19 @@
+.PHONY: build docker run test watch config
 build:
-	@GOOS=linux CGO_ENABLED=0 go build -o build/gerry ./cmd/gerry
+	go build -o build/gerry ./cmd/gerry
+
+docker: build
 	@docker build -t ghcr.io/DistroByte/gerry:latest .
 
 run:
-	@go run cmd/gerry/main.go
+	go run cmd/gerry/main.go start
 
 test:
-	@go test -v ./...
+	go test -v ./...
 
 watch:
-	@air
+	air start
+
+config: build
+	./build/gerry confgen config.yaml
+	

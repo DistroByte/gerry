@@ -58,9 +58,10 @@ func MumbleMessageCreateHandler(event *gumble.TextMessageEvent) {
 	}
 
 	message := &models.Message{
-		Content: event.TextMessage.Message,
-		Author:  event.TextMessage.Sender.Name,
-		Channel: strconv.FormatUint(uint64(event.TextMessage.Sender.Channel.ID), 10),
+		Content:  event.TextMessage.Message,
+		Author:   event.TextMessage.Sender.Name,
+		Channel:  strconv.FormatUint(uint64(event.TextMessage.Sender.Channel.ID), 10),
+		Platform: "mumble",
 	}
 
 	response, err := handlers.HandleMessage(message)

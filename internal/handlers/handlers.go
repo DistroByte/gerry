@@ -10,7 +10,7 @@ import (
 )
 
 func HandleMessage(message *models.Message) (string, error) {
-	slog.Info("processing message", "platform", "discord", "content", message.Content, "author", message.Author, "channel", message.Channel)
+	slog.Info("processing message", "platform", message.Platform, "content", message.Content, "author", message.Author, "channel", message.Channel)
 
 	var cmd string
 	var args []string

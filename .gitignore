@@ -1,7 +1,8 @@
 tmp/
+build/
 .env
 .vscode
 logs/.vscode/
 __debug_*
-markovChain.json
-config.yml
+config.yaml
+karting.json

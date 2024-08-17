@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -16,28 +17,28 @@ var defaultConfig = configuration{}
 type configuration struct {
 	Discord     discordConfig `yaml:"discord"`
 	Mumble      mumbleConfig  `yaml:"mumble"`
-	Prefix      string        `yaml:"prefix"`
+	Prefix      string        `yaml:"prefix" default:">"`
 	Status      string        `yaml:"status"`
-	Environment string        `yaml:"environment"`
+	Environment string        `yaml:"environment" default:"LOCAL" validate:"required,oneof=LOCAL TEST PRODUCTION"`
 }
 
 type discordConfig struct {
 	Token  string `yaml:"token"`
-	Enable bool   `yaml:"enable"`
+	Enable bool   `yaml:"enable" default:"false"`
 }
 
 type mumbleConfig struct {
-	Enable   bool   `yaml:"enable"`
+	Enable   bool   `yaml:"enable" default:"false"`
 	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	TLS      bool   `yaml:"tls"`
+	Port     int    `yaml:"port" default:"64738"`
+	TLS      bool   `yaml:"tls" default:"false"`
 	Username string `yaml:"username"`
 }
 
 var config *configuration
 
 func Load() {
-	file, err := os.Open("config.yml")
+	file, err := os.Open("config.yaml")
 	if err != nil {
 		slog.Error("failed to open config file", "error", err)
 		return
@@ -49,6 +50,27 @@ func Load() {
 		slog.Error("failed to decode config file", "error", err)
 		return
 	}
+}
+
+func Generate(filepath string) {
+	if filepath == "" {
+		filepath = "config.yaml"
+	}
+
+	file, err := os.Create(filepath)
+	if err != nil {
+		fmt.Println("failed to create config file:", err)
+		return
+	}
+	defer file.Close()
+
+	fmt.Println("writing default config to", filepath)
+	if err := yaml.NewEncoder(file).Encode(defaultConfig); err != nil {
+		fmt.Println("failed to encode config file:", err)
+		return
+	}
+
+	fmt.Println("config file generated successfully")
 }
 
 func GetEnvironment() string {

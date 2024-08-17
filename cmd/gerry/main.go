@@ -1,7 +1,28 @@
 package main
 
-import "github.com/DistroByte/gerry/internal/bot"
+import (
+	"fmt"
+	"os"
+
+	"github.com/DistroByte/gerry/internal/bot"
+	"github.com/DistroByte/gerry/internal/config"
+)
 
 func main() {
-	bot.Start()
+	providedArgs := os.Args[1:]
+
+	if len(providedArgs) == 0 {
+		fmt.Println("no arguments provided")
+		os.Exit(1)
+	}
+
+	switch providedArgs[0] {
+
+	case "confgen":
+		config.Generate(providedArgs[1])
+
+	case "start":
+		bot.Start()
+	}
+
 }

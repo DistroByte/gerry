@@ -33,6 +33,8 @@ func DiscordReadyHandler(s *discordgo.Session, event *discordgo.Ready) {
 	if err != nil {
 		slog.Warn("failed to update game status", "error", err)
 	}
+
+	slog.Info("connected to discord")
 }
 
 func DiscordMessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -41,9 +43,10 @@ func DiscordMessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreat
 	}
 
 	message := &models.Message{
-		Content: m.Content,
-		Author:  m.Author.Username,
-		Channel: m.ChannelID,
+		Content:  m.Content,
+		Author:   m.Author.Username,
+		Channel:  m.ChannelID,
+		Platform: "discord",
 	}
 
 	response, err := handlers.HandleMessage(message)
