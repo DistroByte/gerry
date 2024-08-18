@@ -1,0 +1,35 @@
+name: Build and Dockerize Go Binary
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup cache
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      "/root/.cache/go-build"
+                  key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+                  restore-keys: |
+                      ${{ runner.os }}-go-
+
+            - name: Build Docker image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  push: true
+                  tags: |
+                      ghcr.io/distrobyte/gerry:${{ github.sha }}
