@@ -14,12 +14,15 @@ const APP_ENVIRONMENT_PRODUCTION string = "PRODUCTION"
 
 var defaultConfig = configuration{}
 
+var ShutdownChannel = make(chan os.Signal, 1)
+
 type configuration struct {
 	Discord     discordConfig `yaml:"discord"`
 	Mumble      mumbleConfig  `yaml:"mumble"`
 	Prefix      string        `yaml:"prefix" default:">"`
 	Status      string        `yaml:"status"`
 	Environment string        `yaml:"environment" default:"LOCAL" validate:"required,oneof=LOCAL TEST PRODUCTION"`
+	Name        string        `yaml:"name"`
 }
 
 type discordConfig struct {
@@ -37,8 +40,12 @@ type mumbleConfig struct {
 
 var config *configuration
 
-func Load() {
-	file, err := os.Open("config.yaml")
+func Load(path string) {
+	if path == "" {
+		path = "config.yaml"
+	}
+
+	file, err := os.Open(path)
 	if err != nil {
 		slog.Error("failed to open config file", "error", err)
 		return
@@ -97,6 +104,10 @@ func GetBotPrefix() string {
 
 func GetBotStatus() string {
 	return config.Status
+}
+
+func GetBotName() string {
+	return config.Name
 }
 
 func IsDiscordEnabled() bool {

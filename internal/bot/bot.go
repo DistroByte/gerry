@@ -13,8 +13,12 @@ import (
 	"layeh.com/gumble/gumbleutil"
 )
 
-func Start() {
-	config.Load()
+func init() {
+	slog.Info("Bot initializing...")
+}
+
+func Start(configPath string) {
+	config.Load(configPath)
 	if config.IsEnvironment(config.APP_ENVIRONMENT_TEST) {
 		fmt.Println("App environment is test, aborting startup")
 		return
@@ -35,9 +39,8 @@ func Start() {
 	}
 
 	slog.Info("Bot is running. Press CTRL+C to exit.", "environment", config.GetEnvironment())
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	<-sc
+	signal.Notify(config.ShutdownChannel, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	<-config.ShutdownChannel
 }
 
 func addHandlers() {

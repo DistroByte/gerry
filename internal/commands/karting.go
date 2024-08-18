@@ -1,24 +1,33 @@
 package commands
 
 import (
-	"sort"
-	"strconv"
+	"fmt"
+	"strings"
 
 	"github.com/DistroByte/gerry/internal/models"
 	"github.com/DistroByte/gerry/karting"
 )
 
 var league *karting.Karting
+var longestDriverName int
 
 func init() {
 	// Initialize the karting instance
 	league = karting.NewKarting()
 	league.Load()
+	league.Graph()
+
+	// Find the longest driver name
+	for _, driver := range league.Drivers {
+		if len(driver.Name) > longestDriverName {
+			longestDriverName = len(driver.Name)
+		}
+	}
 }
 
 func KartingCommand(args []string, message models.Message) string {
 	if len(args) == 0 {
-		response := "Karting command requires arguments"
+		response := "karting command requires arguments"
 		return response
 	}
 
@@ -37,52 +46,91 @@ func KartingCommand(args []string, message models.Message) string {
 			})
 		}
 
-		err := league.Race(results)
+		raceDiff, err := league.Race(results)
 		if err != nil {
 			return err.Error()
 		}
 
-		return "race results recorded"
-
-	case "stats":
-		stats := league.Stats()
-		response := "Karting stats:\n"
-		for driver, stat := range stats {
-			response += strconv.Itoa(stat.ELO) + " | " + driver + " - " + strconv.Itoa(stat.TotalWins) + " wins out of " + strconv.Itoa(stat.TotalRaces) + " races\n"
+		response := "# Race results\n"
+		response += fmt.Sprintf("```%*s | Rating change\n", longestDriverName, "Driver")
+		for _, diff := range raceDiff {
+			response += fmt.Sprintf("%*s | %d -> %d (%+d)\n", longestDriverName, diff.Driver.Name, diff.Driver.ELO-diff.Change, diff.Driver.ELO, diff.Change)
 		}
+		response += "```"
 
 		return response
 
-	case "drivers":
-		response := "Drivers:\n"
-		// sort the drivers by ELO
-		sort.Slice(league.Drivers, func(i, j int) bool {
-			return league.Drivers[i].ELO > league.Drivers[j].ELO
-		})
+	case "stats":
+		response := fmt.Sprintf("# Karting stats\n```Rating | %-*s | Won | Total | Win %%  | Last 5 avg (all time) | Peak ELO\n", longestDriverName, "Driver")
+		response += "------ | " + fmt.Sprintf("%s | --- | ----- | ------ | --------------------- | --------\n", strings.Repeat("-", longestDriverName))
+
+		for i := 0; i < len(league.Drivers); i++ {
+			for j := i + 1; j < len(league.Drivers); j++ {
+				if league.Drivers[i].ELO < league.Drivers[j].ELO {
+					league.Drivers[i], league.Drivers[j] = league.Drivers[j], league.Drivers[i]
+				}
+			}
+		}
 
 		for _, driver := range league.Drivers {
-			response += strconv.Itoa(driver.ELO) + " | " + driver.Name + "\n"
+			winRate := float64(driver.Stats.TotalWins) / float64(driver.Stats.TotalRaces) * 100
+
+			var last5 float64
+			for _, finish := range driver.Stats.Last5Finish {
+				last5 += float64(finish)
+			}
+			last5 /= 5
+
+			response += fmt.Sprintf("%6d | %-*s | %3d | %5d | %5.2f%% | %21s | %8d\n", driver.ELO, longestDriverName, driver.Name, driver.Stats.TotalWins, driver.Stats.TotalRaces, winRate,
+				fmt.Sprintf("%.2f (%.2f)", last5, driver.Stats.AllTimeAverageFinish/float64(driver.Stats.TotalRaces)), driver.Stats.PeakELO)
 		}
+
+		response += "```"
 
 		return response
 
 	case "register":
 		if len(args) < 2 {
-			return "Karting register command requires a driver name"
+			return "karting register command requires a driver name"
 		}
 
 		res, err := league.Register(args[1])
 		if err != nil {
 			return err.Error()
 		}
+
+		// update the longest driver name for formatting
+		if len(args[1]) > longestDriverName {
+			longestDriverName = len(args[1])
+		}
+
 		return res
+
+	case "unregister":
+		if len(args) < 2 {
+			return "karting unregister command requires a driver name"
+		}
+
+		res, err := league.Unregister(args[1])
+		if err != nil {
+			return err.Error()
+		}
+
+		return res
+
+	case "graph":
+		league.Graph()
+		return "graph generated"
 
 	case "reset":
 		league.Reset()
-		return "Karting stats have been reset"
+		return "karting stats have been reset"
+
+	default:
+		break
 	}
 
-	response := "Invalid karting command"
+	response := "invalid karting command"
 
 	return response
 }

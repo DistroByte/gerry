@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"log/slog"
+	"os"
+	"syscall"
 
 	"github.com/DistroByte/gerry/internal/commands"
 	"github.com/DistroByte/gerry/internal/config"
@@ -20,8 +22,10 @@ func HandleMessage(message *models.Message) (string, error) {
 	args, err := shlex.Split(message.Content)
 	if len(args) > 1 {
 		cmd, args = args[0], args[1:]
-	} else {
+	} else if len(args) == 1 {
 		cmd = args[0]
+	} else {
+		return "", nil
 	}
 
 	if err != nil {
@@ -42,6 +46,10 @@ func HandleMessage(message *models.Message) (string, error) {
 
 	case prefix + "karting":
 		return commands.KartingCommand(args, *message), nil
+
+	case prefix + "shutdown":
+		config.ShutdownChannel <- os.Signal(syscall.SIGTERM)
+		return "Shutting down...", nil
 
 	default:
 		break

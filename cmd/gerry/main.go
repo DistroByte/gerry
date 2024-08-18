@@ -22,7 +22,11 @@ func main() {
 		config.Generate(providedArgs[1])
 
 	case "start":
-		bot.Start()
-	}
+		if providedArgs[1] == "" {
+			fmt.Println("no config file provided")
+			os.Exit(1)
+		}
 
+		bot.Start(providedArgs[1])
+	}
 }
