@@ -5,8 +5,7 @@ COPY go.mod go.sum ./
 COPY vendor ./
 COPY . .
 
-ENV GOCACHE=/root/.cache/go-build
-RUN --mount=type=cache,target="/root/.cache/go-build" make build
+RUN make build
 
 FROM gcr.io/distroless/static-debian12:nonroot
 

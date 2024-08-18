@@ -35,6 +35,8 @@ func InitMumbleSession() {
 		if err != nil {
 			slog.Error("failed to create mumble session", "error", err)
 		}
+
+		slog.Info("mumble session created", "host", config.GetMumbleHost(), "port", config.GetMumblePort())
 	}
 }
 
