@@ -1,13 +1,15 @@
-# FROM golang:1.22-alpine as build
-# WORKDIR /src
-# COPY go.mod .
-# COPY go.sum .
-# RUN go mod download
-# COPY . .
-# RUN 
+FROM golang:1.23-bookworm AS builder
 
-FROM alpine:3
-RUN addgroup -g 1000 gerry && adduser -u 1000 -G gerry -D gerry
-USER gerry
-COPY ./build/gerry /bin
-CMD [ "/bin/gerry" ]
+WORKDIR /go/src/gerry
+COPY go.mod go.sum ./
+COPY vendor ./
+COPY . .
+
+ENV GOCACHE=/root/.cache/go-build
+RUN --mount=type=cache,target="/root/.cache/go-build" make build
+
+FROM gcr.io/distroless/static-debian12:nonroot
+
+COPY --from=builder /go/src/gerry/build/gerry /
+
+CMD [ "/gerry", "start", "/etc/gerry/config.yaml" ]

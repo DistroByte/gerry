@@ -1,0 +1,13 @@
+config.yaml
+elo.png
+karting.json
+.vscode/
+build/
+.github/
+.git/
+.gitignore
+LICENSE
+README.md
+tmp/
+__debug_*
+.air.toml
