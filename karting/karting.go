@@ -3,17 +3,31 @@ package karting
 import (
 	"encoding/json"
 	"fmt"
+	"image/color"
 	"log/slog"
 	"os"
 	"strings"
 	"time"
 )
 
-const InitialELO = 1000
+const (
+	InitialELO = 1000
+)
+
+var colors = []color.Color{
+	color.RGBA{R: 255, A: 255},
+	color.RGBA{G: 255, A: 255},
+	color.RGBA{B: 255, A: 255},
+	color.RGBA{R: 255, G: 255, A: 255},
+	color.RGBA{R: 255, B: 255, A: 255},
+	color.RGBA{G: 255, B: 255, A: 255},
+}
 
 type Driver struct {
-	Name string
-	ELO  int
+	Name      string
+	ELO       int
+	ELOChange int
+	Stats     *DriverStats
 }
 
 type Result struct {
@@ -31,10 +45,17 @@ type Karting struct {
 	Races   []Event
 }
 
-type driverStats struct {
-	TotalRaces int
-	TotalWins  int
-	ELO        int
+type DriverStats struct {
+	TotalRaces           int
+	TotalWins            int
+	AllTimeAverageFinish float64
+	Last5Finish          []int
+	PeakELO              int
+}
+
+type RaceDiff struct {
+	Driver *Driver
+	Change int
 }
 
 func NewKarting() *Karting {
@@ -44,61 +65,20 @@ func NewKarting() *Karting {
 	}
 }
 
-func (k *Karting) Race(results []*Result) error {
-	// the result we get passed has no ELO, so we need to look up the driver in our list
-	populatedResults := make([]*Result, 0, len(results))
-
-	for _, result := range results {
-		found := false
-		for _, driver := range k.Drivers {
-			if driver.Name == result.Driver.Name {
-				result.Driver.ELO = driver.ELO
-				populatedResults = append(populatedResults, result)
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			return fmt.Errorf("driver %q not found", result.Driver.Name)
-		}
-
-		// update the driver's ELO
-		if result.Position == 1 {
-			result.Driver.ELO += 32
-		}
-	}
-
-	event := Event{
-		Results: populatedResults,
-		Date:    time.Now(),
-	}
-
-	// update the global driver elo
-	for _, driver := range k.Drivers {
-		for _, result := range event.Results {
-			if driver.Name == result.Driver.Name {
-				driver.ELO = result.Driver.ELO
-			}
-		}
-	}
-
-	k.Races = append(k.Races, event)
-
-	save(k)
-
-	return nil
-}
-
-func (k *Karting) Stats() map[string]*driverStats {
-	return calculateStats(k)
-}
-
 func (k *Karting) Reset() {
 	for _, driver := range k.Drivers {
 		slog.Info("resetting driver", "driver", driver.Name)
 		driver.ELO = InitialELO
+		driver.ELOChange = 0
+		driver.Stats = &DriverStats{
+			TotalRaces:           0,
+			TotalWins:            0,
+			AllTimeAverageFinish: 0,
+			Last5Finish:          []int{},
+			PeakELO:              InitialELO,
+		}
 	}
+	k.Races = []Event{}
 
 	save(k)
 }
@@ -112,7 +92,17 @@ func (k *Karting) Register(name string) (string, error) {
 		}
 	}
 
-	k.Drivers = append(k.Drivers, &Driver{Name: name, ELO: InitialELO})
+	k.Drivers = append(k.Drivers, &Driver{
+		Name: name,
+		ELO:  InitialELO,
+		Stats: &DriverStats{
+			TotalRaces:           0,
+			TotalWins:            0,
+			AllTimeAverageFinish: 0,
+			Last5Finish:          []int{},
+			PeakELO:              InitialELO,
+		},
+	})
 
 	err := save(k)
 	if err != nil {
@@ -120,6 +110,23 @@ func (k *Karting) Register(name string) (string, error) {
 	}
 
 	return fmt.Sprintf("registered %q", name), nil
+}
+
+func (k *Karting) Unregister(name string) (string, error) {
+	name = strings.ToLower(name)
+
+	for i, driver := range k.Drivers {
+		if strings.ToLower(driver.Name) == name {
+			k.Drivers = append(k.Drivers[:i], k.Drivers[i+1:]...)
+			err := save(k)
+			if err != nil {
+				return "", err
+			}
+			return fmt.Sprintf("unregistered %q", name), nil
+		}
+	}
+
+	return "", fmt.Errorf("driver %s not found", name)
 }
 
 func (k *Karting) Load() {
@@ -150,27 +157,4 @@ func save(karting *Karting) error {
 	}
 
 	return nil
-}
-
-func calculateStats(karting *Karting) map[string]*driverStats {
-	stats := make(map[string]*driverStats)
-
-	for _, event := range karting.Races {
-		for _, result := range event.Results {
-			stat, ok := stats[result.Driver.Name]
-			if !ok {
-				stat = &driverStats{}
-				stats[result.Driver.Name] = stat
-			}
-
-			stat.TotalRaces++
-			if result.Position == 1 {
-				stat.TotalWins++
-			}
-
-			stat.ELO = result.Driver.ELO
-		}
-	}
-
-	return stats
 }
