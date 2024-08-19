@@ -32,8 +32,9 @@ jobs:
                   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
                   tags: |
                       type=sha,format=long
-                      type=branch,format=short
-                      type=latest
+                      type=ref,event=branch
+                  flavor: |
+                      latest=auto
 
             - name: Build Docker image
               uses: docker/build-push-action@v6
