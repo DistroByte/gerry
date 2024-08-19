@@ -131,8 +131,12 @@ func (k *Karting) Unregister(name string) (string, error) {
 
 func (k *Karting) Load() {
 	slog.Debug("loading karting data")
+	dir, err := os.Getwd()
+	if err != nil {
+		return
+	}
 
-	data, err := os.ReadFile("./karting.json")
+	data, err := os.ReadFile(dir + "/karting.json")
 	if err != nil {
 		slog.Error("failed to read karting data", "error", err)
 	}
@@ -144,14 +148,18 @@ func (k *Karting) Load() {
 }
 
 func save(karting *Karting) error {
-	slog.Info("writing karting data")
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	slog.Info("writing karting data to", "file", dir+"/karting.json")
 
 	out, err := json.Marshal(karting)
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile("./karting.json", out, 0644)
+	err = os.WriteFile(dir+"/karting.json", out, 0644)
 	if err != nil {
 		return err
 	}
