@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/DistroByte/gerry/internal/config"
 )
 
 const (
@@ -134,14 +132,7 @@ func (k *Karting) Unregister(name string) (string, error) {
 func (k *Karting) Load() {
 	slog.Debug("loading karting data")
 
-	var path string
-	if config.GetEnvironment() == config.APP_ENVIRONMENT_PRODUCTION {
-		path = "/app/karting.json"
-	} else {
-		path = "./karting.json"
-	}
-
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile("./karting.json")
 	if err != nil {
 		slog.Error("failed to read karting data", "error", err)
 	}
@@ -160,14 +151,7 @@ func save(karting *Karting) error {
 		return err
 	}
 
-	var path string
-	if config.GetEnvironment() == config.APP_ENVIRONMENT_PRODUCTION {
-		path = "/app/karting.json"
-	} else {
-		path = "./karting.json"
-	}
-
-	err = os.WriteFile(path, out, 0644)
+	err = os.WriteFile("./karting.json", out, 0644)
 	if err != nil {
 		return err
 	}
