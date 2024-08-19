@@ -7,17 +7,11 @@ import (
 
 func ServeHTTP(port int) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("received request", "method", r.Method, "url", r.URL.Path, "remote", r.Header.Get("Cf-Connecting-Ip"), "user-agent", r.UserAgent(), "accept", r.Header.Get("Accept"))
+		slog.Info("received request", "method", r.Method, "url", r.URL.Path, "remote", r.Header.Get("Cf-Connecting-Ip"), "user-agent", r.UserAgent())
 
 		// ensure we only respond to GET requests
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		// ensure we set the accept header
-		if r.Header.Get("Accept") == "" {
-			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
