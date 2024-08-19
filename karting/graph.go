@@ -133,6 +133,13 @@ func (k *Karting) Graph() {
 	}
 
 	slog.Debug("saved plot to elo.svg")
+
+	if err := p.Save(30*vg.Centimeter, 20*vg.Centimeter, "elo.png"); err != nil {
+		slog.Error("failed to save plot", "error", err)
+		return
+	}
+
+	slog.Debug("saved plot to elo.png")
 }
 
 type raceTicker struct{}
