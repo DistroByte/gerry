@@ -7,8 +7,9 @@ COPY . .
 
 RUN make build
 
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM gcr.io/distroless/static-debian12
 
 COPY --from=builder /go/src/gerry/build/gerry /
+WORKDIR /app
 
 CMD [ "/gerry", "start", "/app/config.yaml" ]
