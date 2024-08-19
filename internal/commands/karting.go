@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/models"
 	"github.com/DistroByte/gerry/karting"
 )
@@ -57,6 +58,9 @@ func KartingCommand(args []string, message models.Message) string {
 			response += fmt.Sprintf("%*s | %d -> %d (%+d)\n", longestDriverName, diff.Driver.Name, diff.Driver.ELO-diff.Change, diff.Driver.ELO, diff.Change)
 		}
 		response += "```"
+
+		// update the graph
+		league.Graph()
 
 		return response
 
@@ -120,7 +124,12 @@ func KartingCommand(args []string, message models.Message) string {
 
 	case "graph":
 		league.Graph()
-		return "graph generated"
+		// return the URL to the graph
+		if config.IsEnvironment(config.APP_ENVIRONMENT_LOCAL) {
+			return fmt.Sprintf("http://localhost:%d/karting", config.GetHTTPPort())
+		} else {
+			return fmt.Sprintf("https://%s/karting", config.GetDomain())
+		}
 
 	case "reset":
 		league.Reset()

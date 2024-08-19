@@ -6,13 +6,13 @@ docker:
 	@docker build -t ghcr.io/distrobyte/gerry:latest .
 
 run:
-	go run cmd/gerry/main.go start
+	go run cmd/gerry/main.go start config.yaml
 
 test:
 	go test -v ./...
 
 watch:
-	air start
+	air start config.yaml
 
 config: build
 	./build/gerry confgen config.yaml

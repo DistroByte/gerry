@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/DistroByte/gerry/http"
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/discord"
 	"github.com/DistroByte/gerry/internal/mumble"
@@ -36,6 +37,10 @@ func Start(configPath string) {
 
 	if config.IsDiscordEnabled() {
 		discord.InitDiscordConnection()
+	}
+
+	if config.IsHTTPEndpointEnabled() {
+		go http.ServeHTTP(config.GetHTTPPort())
 	}
 
 	slog.Info("Bot is running. Press CTRL+C to exit.", "environment", config.GetEnvironment())

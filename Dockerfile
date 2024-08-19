@@ -11,4 +11,4 @@ FROM gcr.io/distroless/static-debian12:nonroot
 
 COPY --from=builder /go/src/gerry/build/gerry /
 
-CMD [ "/gerry", "start", "/etc/gerry/config.yaml" ]
+CMD [ "/gerry", "start", "/app/config.yaml" ]

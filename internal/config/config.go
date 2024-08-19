@@ -10,7 +10,7 @@ import (
 
 const APP_ENVIRONMENT_LOCAL string = "LOCAL"
 const APP_ENVIRONMENT_TEST string = "TEST"
-const APP_ENVIRONMENT_PRODUCTION string = "PRODUCTION"
+const APP_ENVIRONMENT_PRODUCTION string = "PROD"
 
 var defaultConfig = configuration{}
 
@@ -19,15 +19,22 @@ var ShutdownChannel = make(chan os.Signal, 1)
 type configuration struct {
 	Discord     discordConfig `yaml:"discord"`
 	Mumble      mumbleConfig  `yaml:"mumble"`
+	HTTP        httpConfig    `yaml:"http"`
 	Prefix      string        `yaml:"prefix" default:">"`
 	Status      string        `yaml:"status"`
-	Environment string        `yaml:"environment" default:"LOCAL" validate:"required,oneof=LOCAL TEST PRODUCTION"`
+	Environment string        `yaml:"environment" default:"LOCAL" validate:"required,oneof=LOCAL TEST PROD"`
+	Domain      string        `yaml:"domain"`
 	Name        string        `yaml:"name"`
 }
 
 type discordConfig struct {
 	Token  string `yaml:"token"`
 	Enable bool   `yaml:"enable" default:"false"`
+}
+
+type httpConfig struct {
+	Port   int  `yaml:"port" default:"8080"`
+	Enable bool `yaml:"enable" default:"false"`
 }
 
 type mumbleConfig struct {
@@ -98,6 +105,10 @@ func IsEnvironment(environments ...string) bool {
 	return false
 }
 
+func GetDomain() string {
+	return config.Domain
+}
+
 func GetBotPrefix() string {
 	return config.Prefix
 }
@@ -136,4 +147,12 @@ func GetMumbleUsername() string {
 
 func GetMumbleTLS() bool {
 	return config.Mumble.TLS
+}
+
+func IsHTTPEndpointEnabled() bool {
+	return config.HTTP.Enable
+}
+
+func GetHTTPPort() int {
+	return config.HTTP.Port
 }

@@ -7,7 +7,7 @@ import (
 
 func SendMumbleMessage(channelID uint32, message string) {
 	if message == "" {
-		slog.Error("cannot send an empty message")
+		slog.Debug("message is empty")
 		return
 	}
 

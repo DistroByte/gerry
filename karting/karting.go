@@ -130,7 +130,7 @@ func (k *Karting) Unregister(name string) (string, error) {
 }
 
 func (k *Karting) Load() {
-	slog.Info("loading karting data")
+	slog.Debug("loading karting data")
 
 	data, err := os.ReadFile("karting.json")
 	if err != nil {

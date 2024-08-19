@@ -35,7 +35,8 @@ func (k *Karting) Graph() {
 	p.Add(plotter.NewGrid())
 
 	// tick every 5 x values
-	p.X.Tick.Marker = customTicker{}
+	p.X.Tick.Marker = raceTicker{}
+	p.Y.Tick.Marker = eloTicker{}
 
 	// pad the y axis a bit
 	p.Y.Min = float64(k.Drivers[len(k.Drivers)-1].ELO - 50)
@@ -48,7 +49,7 @@ func (k *Karting) Graph() {
 		xys := make(plotter.XYs, len(k.Races)+1)
 		labels := make([]string, len(k.Races)+1)
 
-		var firstRaceIndex int = 0
+		var firstRaceIndex int = -1
 
 		// loop over every race
 		for i, event := range k.Races {
@@ -60,9 +61,9 @@ func (k *Karting) Graph() {
 				if result.Driver.Name == driver.Name {
 
 					// and this is the first time we've seen them
-					if firstRaceIndex == 0 {
+					if firstRaceIndex < 0 {
 						// add the initial ELO to the race before their first
-						xys[i].X = float64(i - 1)
+						xys[i].X = float64(i)
 						xys[i].Y = float64(InitialELO)
 						labels[i] = strconv.Itoa(InitialELO)
 						// and remember the index
@@ -70,7 +71,7 @@ func (k *Karting) Graph() {
 					}
 
 					// add the ELO for the driver for the current race
-					xys[i+1].X = float64(i)
+					xys[i+1].X = float64(i + 1)
 					xys[i+1].Y = float64(result.Driver.ELO)
 					break
 				} else {
@@ -80,10 +81,19 @@ func (k *Karting) Graph() {
 				}
 			}
 
-			// add an ELO label every 5 races
-			if i%5 == 0 {
+			// add an ELO label every 3 races
+			if i%3 == 0 {
 				labels[i+1] = strconv.FormatFloat(xys[i+1].Y, 'f', 0, 64)
 			}
+		}
+
+		if firstRaceIndex < 0 {
+			slog.Debug("driver never raced", "driver", driver.Name)
+			// set the last value to the initial ELO
+			xys[len(xys)-1].X = float64(len(xys) - 1)
+			xys[len(xys)-1].Y = float64(InitialELO)
+			labels[len(labels)-1] = strconv.Itoa(InitialELO)
+			firstRaceIndex = len(xys) - 1
 		}
 
 		// add the last label
@@ -117,19 +127,28 @@ func (k *Karting) Graph() {
 		p.Legend.Add(fmt.Sprintf("%s (%d)", driver.Name, driver.ELO), line)
 	}
 
-	if err := p.Save(30*vg.Centimeter, 20*vg.Centimeter, "elo.png"); err != nil {
+	if err := p.Save(30*vg.Centimeter, 20*vg.Centimeter, "elo.svg"); err != nil {
 		slog.Error("failed to save plot", "error", err)
 		return
 	}
 
-	slog.Info("saved plot to elo.png")
+	slog.Debug("saved plot to elo.svg")
 }
 
-type customTicker struct{}
+type raceTicker struct{}
+type eloTicker struct{}
 
-func (t customTicker) Ticks(min, max float64) []plot.Tick {
+func (t raceTicker) Ticks(min, max float64) []plot.Tick {
 	var ticks []plot.Tick
-	for i := min; i <= max; i += 5 {
+	for i := min + 1; i < max; i += 3 {
+		ticks = append(ticks, plot.Tick{Value: i, Label: strconv.Itoa(int(i))})
+	}
+	return ticks
+}
+
+func (t eloTicker) Ticks(min, max float64) []plot.Tick {
+	var ticks []plot.Tick
+	for i := min; i < max; i += 10 {
 		ticks = append(ticks, plot.Tick{Value: i, Label: strconv.Itoa(int(i))})
 	}
 	return ticks
