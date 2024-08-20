@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"log/slog"
-	"os"
 	"syscall"
 
 	"github.com/DistroByte/gerry/internal/commands"
@@ -12,18 +11,20 @@ import (
 )
 
 func HandleMessage(message *models.Message) (string, error) {
-	slog.Info("processing message", "platform", message.Platform, "content", message.Content, "author", message.Author, "channel", message.Channel)
+	slog.Info("message", "platform", message.Platform, "content", message.Content, "author", message.Author, "channel", message.Channel)
 
 	var cmd string
 	var args []string
 
 	prefix := config.GetBotPrefix()
-
 	args, err := shlex.Split(message.Content)
+
 	if len(args) > 1 {
 		cmd, args = args[0], args[1:]
+
 	} else if len(args) == 1 {
 		cmd = args[0]
+
 	} else {
 		return "", nil
 	}
@@ -37,18 +38,20 @@ func HandleMessage(message *models.Message) (string, error) {
 		return "", nil
 	}
 
+	cmd = cmd[len(prefix):]
+
 	switch cmd {
-	case prefix + "ping":
+	case "ping":
 		return commands.PingCommand(), nil
 
-	case prefix + "echo":
+	case "echo":
 		return commands.EchoCommand(args), nil
 
-	case prefix + "karting":
+	case "karting":
 		return commands.KartingCommand(args, *message), nil
 
-	case prefix + "shutdown":
-		config.ShutdownChannel <- os.Signal(syscall.SIGTERM)
+	case "shutdown":
+		config.ShutdownChannel <- syscall.SIGINT
 		return "Shutting down...", nil
 
 	default:

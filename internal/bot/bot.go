@@ -21,7 +21,7 @@ func init() {
 func Start(configPath string) {
 	config.Load(configPath)
 	if config.IsEnvironment(config.APP_ENVIRONMENT_TEST) {
-		fmt.Println("App environment is test, aborting startup")
+		fmt.Println("app environment is test, aborting startup")
 		return
 	}
 
@@ -43,9 +43,23 @@ func Start(configPath string) {
 		go http.ServeHTTP(config.GetHTTPPort())
 	}
 
-	slog.Info("Bot is running. Press CTRL+C to exit.", "environment", config.GetEnvironment())
+	slog.Info("bot is running. press CTRL+C to exit.", "environment", config.GetEnvironment())
 	signal.Notify(config.ShutdownChannel, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-config.ShutdownChannel
+	slog.Info("shutting down...")
+
+	if config.IsDiscordEnabled() {
+		discord.DiscordSession.Close()
+		slog.Info("discord closed")
+	}
+
+	if config.IsMumbleEnabled() {
+		mumble.MumbleSession.Disconnect()
+		slog.Info("mumble disconnected")
+	}
+
+	slog.Info("goodbye")
+	os.Exit(0)
 }
 
 func addHandlers() {
