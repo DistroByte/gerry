@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	slog.Info("Bot initializing...")
+	slog.Info("bot initializing...")
 }
 
 func Start(configPath string) {
