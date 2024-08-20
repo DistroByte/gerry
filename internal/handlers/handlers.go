@@ -48,7 +48,19 @@ func HandleMessage(message *models.Message) (string, error) {
 		return commands.EchoCommand(args), nil
 
 	case "karting":
-		return commands.KartingCommand(args, *message), nil
+		switch args[0] {
+		case "race":
+			return commands.KartingRaceCommand(args, *message), nil
+
+		case "stats":
+			return commands.KartingStatsCommand(args, *message), nil
+
+		default:
+			return commands.KartingCommand(args, *message), nil
+		}
+
+	case "uptime":
+		return commands.UptimeCommand(), nil
 
 	case "shutdown":
 		config.ShutdownChannel <- syscall.SIGINT

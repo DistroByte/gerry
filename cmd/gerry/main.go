@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/DistroByte/gerry/internal/bot"
 	"github.com/DistroByte/gerry/internal/config"
@@ -27,6 +28,7 @@ func main() {
 			os.Exit(1)
 		}
 
+		config.StartTime = time.Now()
 		bot.Start(providedArgs[1])
 	}
 }

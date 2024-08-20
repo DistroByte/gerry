@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -15,6 +16,7 @@ const APP_ENVIRONMENT_PRODUCTION string = "PROD"
 var defaultConfig = configuration{}
 
 var ShutdownChannel = make(chan os.Signal, 1)
+var StartTime time.Time
 
 type configuration struct {
 	Discord     discordConfig `yaml:"discord"`
