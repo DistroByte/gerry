@@ -7,7 +7,7 @@ import (
 
 func ServeHTTP(port int) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("received request", "method", r.Method, "url", r.URL.Path, "remote", r.Header.Get("Cf-Connecting-Ip"), "user-agent", r.UserAgent())
+		slog.Info("received request", "method", r.Method, "url", r.URL.Path, "ip", r.Header.Get("Cf-Connecting-Ip"), "user-agent", r.UserAgent())
 
 		// ensure we only respond to GET requests
 		if r.Method != http.MethodGet {
@@ -35,7 +35,6 @@ func ServeHTTP(port int) {
 		if r.URL.Path == "/karting.png" {
 			w.Header().Set("Content-Type", "image/png")
 			http.ServeFile(w, r, "elo.png")
-			slog.Info("served karting.png to client", "remote", r.Header.Get("Cf-Connecting-Ip"))
 			return
 		}
 

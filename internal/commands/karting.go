@@ -128,7 +128,7 @@ func KartingCommand(args []string, message models.Message) string {
 		if config.IsEnvironment(config.APP_ENVIRONMENT_LOCAL) {
 			return fmt.Sprintf("http://localhost:%d/karting", config.GetHTTPPort())
 		} else {
-			return fmt.Sprintf("[karting stats](https://%s/karting.png)", config.GetDomain())
+			return fmt.Sprintf("https://%s/karting.png", config.GetDomain())
 		}
 
 	case "reset":
