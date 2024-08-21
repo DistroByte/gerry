@@ -24,9 +24,10 @@ func initHTTPServer() {
 			Msg("")
 	}))
 	c = c.Append(hlog.RemoteAddrHandler("ip"))
-	c = c.Append(hlog.CustomHeaderHandler("Cf-Connecting-Ip", "connecting-ip"))
+	c = c.Append(hlog.CustomHeaderHandler("connecting-ip", "Cf-Connecting-Ip"))
 	c = c.Append(hlog.UserAgentHandler("user-agent"))
 	c = c.Append(hlog.RequestIDHandler("req_id", "Request-Id"))
+	c = c.Append(hlog.RefererHandler("referer"))
 
 	// create a new mux
 	mux := http.NewServeMux()

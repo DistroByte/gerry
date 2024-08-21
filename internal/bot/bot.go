@@ -43,6 +43,7 @@ func Start() {
 
 	log.Info().
 		Str("environment", config.GetEnvironment()).
+		Str("event", "startup").
 		Msg("bot is running. press CTRL+C to exit.")
 
 	signal.Notify(config.ShutdownChannel, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
