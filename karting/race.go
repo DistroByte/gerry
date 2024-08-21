@@ -105,7 +105,7 @@ func (k *Karting) Race(results []*Result) ([]RaceDiff, error) {
 	// create the event
 	event := Event{
 		Results: populatedResults,
-		Date:    time.Now(),
+		Date:    time.Now().Unix(),
 	}
 	k.Races = append(k.Races, event)
 

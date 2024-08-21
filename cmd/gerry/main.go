@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnixNano
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 }
 

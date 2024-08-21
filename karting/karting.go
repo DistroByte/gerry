@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"strings"
-	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -36,7 +35,7 @@ type Result struct {
 
 type Event struct {
 	Results []*Result
-	Date    time.Time
+	Date    int64
 }
 
 type Karting struct {
