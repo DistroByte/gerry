@@ -12,19 +12,19 @@ import (
 func initHTTPServer() {
 	c := alice.New()
 
-	c = c.Append(hlog.NewHandler(log.Logger))
+	c = c.Append(hlog.NewHandler(log.Logger.With().Str("component", "http").Logger()))
 
 	c = c.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
 		hlog.FromRequest(r).Info().
 			Str("method", r.Method).
 			Stringer("url", r.URL).
+			Str("Cf-Connecting-Ip", r.Header.Get("Cf-Connecting-Ip")).
 			Int("status", status).
 			Int("size", size).
 			Dur("duration", duration).
 			Msg("")
 	}))
 	c = c.Append(hlog.RemoteAddrHandler("ip"))
-	c = c.Append(hlog.CustomHeaderHandler("connecting-ip", "Cf-Connecting-Ip"))
 	c = c.Append(hlog.UserAgentHandler("user-agent"))
 	c = c.Append(hlog.RequestIDHandler("req_id", "Request-Id"))
 	c = c.Append(hlog.RefererHandler("referer"))
