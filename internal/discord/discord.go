@@ -1,7 +1,7 @@
 package discord
 
 import (
-	"log/slog"
+	"github.com/rs/zerolog/log"
 )
 
 func SearchGuildByChannelID(textChannelID string) (guildID string) {
@@ -11,13 +11,8 @@ func SearchGuildByChannelID(textChannelID string) (guildID string) {
 }
 
 func SendDiscordMessage(channelID string, message string) {
-	if message == "" {
-		slog.Debug("message is empty")
-		return
-	}
-
 	_, err := DiscordSession.ChannelMessageSend(channelID, message)
 	if err != nil {
-		slog.Error("failed to send message", "error", err)
+		log.Error().Err(err).Msg("failed to send message")
 	}
 }

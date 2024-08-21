@@ -1,12 +1,15 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/models"
 	"github.com/DistroByte/gerry/karting"
+	"github.com/rs/zerolog/log"
 )
 
 var league *karting.Karting
@@ -15,8 +18,7 @@ var longestDriverName int
 func init() {
 	// Initialize the karting instance
 	league = karting.NewKarting()
-	league.Load()
-	league.Graph()
+	load()
 
 	// Find the longest driver name
 	for _, driver := range league.Drivers {
@@ -48,6 +50,7 @@ func KartingCommand(args []string, message models.Message) string {
 			longestDriverName = len(args[1])
 		}
 
+		save()
 		return res
 
 	case "unregister":
@@ -60,6 +63,7 @@ func KartingCommand(args []string, message models.Message) string {
 			return err.Error()
 		}
 
+		save()
 		return res
 
 	case "graph":
@@ -73,6 +77,7 @@ func KartingCommand(args []string, message models.Message) string {
 
 	case "reset":
 		league.Reset()
+		save()
 		return "karting stats have been reset"
 
 	default:
@@ -141,6 +146,47 @@ func KartingRaceCommand(args []string, message models.Message) string {
 
 	// update the graph
 	league.Graph()
+	save()
 
 	return response
+}
+
+func save() error {
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	log.Info().
+		Str("file", dir+"/karting.json").
+		Msg("writing karting data to")
+
+	out, err := json.Marshal(league)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(dir+"/karting.json", out, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func load() {
+	log.Debug().Msg("loading karting data")
+	dir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	data, err := os.ReadFile(dir + "/karting.json")
+	if err != nil {
+		log.Error().Err(err).Msg("failed to read karting data")
+	}
+
+	err = json.Unmarshal(data, &league)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to unmarshal karting data")
+	}
 }

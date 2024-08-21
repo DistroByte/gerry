@@ -3,7 +3,6 @@ package mumble
 import (
 	"crypto/tls"
 	"fmt"
-	"log/slog"
 	"net"
 	"strconv"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/handlers"
 	"github.com/DistroByte/gerry/internal/models"
+	"github.com/rs/zerolog/log"
 	"layeh.com/gumble/gumble"
 )
 
@@ -33,15 +33,20 @@ func InitMumbleSession() {
 			MumbleConfig,
 			&tlsConfig)
 		if err != nil {
-			slog.Error("failed to create mumble session", "error", err)
+			log.Fatal().Err(err).Msg("failed to create mumble session")
 		}
 
-		slog.Info("mumble session created", "host", config.GetMumbleHost(), "port", config.GetMumblePort())
+		log.Info().
+			Str("host", config.GetMumbleHost()).
+			Int("port", config.GetMumblePort()).
+			Msg("mumble session created")
 	}
 }
 
 func MumbleReadyHandler(event *gumble.ConnectEvent) {
-	slog.Info("connected to mumble server", "address", event.Client.Conn.RemoteAddr())
+	log.Info().
+		Str("address", event.Client.Conn.RemoteAddr().String()).
+		Msg("connected to mumble server")
 }
 
 func MumbleMessageCreateHandler(event *gumble.TextMessageEvent) {
@@ -67,7 +72,7 @@ func MumbleMessageCreateHandler(event *gumble.TextMessageEvent) {
 	}
 
 	response, err := handlers.HandleMessage(message)
-	if err == nil {
+	if err == nil && response != "" {
 		channelIDInt, _ := strconv.ParseInt(message.Channel, 10, 32)
 		SendMumbleMessage(uint32(channelIDInt), response)
 	}

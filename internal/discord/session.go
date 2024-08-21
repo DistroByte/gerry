@@ -1,12 +1,11 @@
 package discord
 
 import (
-	"log/slog"
-
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/handlers"
 	"github.com/DistroByte/gerry/internal/models"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog/log"
 )
 
 var DiscordSession *discordgo.Session
@@ -15,7 +14,7 @@ func InitDiscordSession() {
 	var err error
 	DiscordSession, err = discordgo.New("Bot " + config.GetDiscordToken())
 	if err != nil {
-		slog.Error("failed to create discord session", "error", err)
+		log.Fatal().Err(err).Msg("failed to create discord session")
 	}
 
 	DiscordSession.Identify.Intents = discordgo.IntentsGuildMessages |
@@ -27,7 +26,7 @@ func InitDiscordSession() {
 
 func InitDiscordConnection() {
 	if err := DiscordSession.Open(); err != nil {
-		slog.Error("failed to create websocket connection to discord", "error", err)
+		log.Fatal().Err(err).Msg("failed to create websocket connection to discord")
 		return
 	}
 }
@@ -35,10 +34,10 @@ func InitDiscordConnection() {
 func DiscordReadyHandler(s *discordgo.Session, event *discordgo.Ready) {
 	err := s.UpdateListeningStatus(config.GetBotStatus())
 	if err != nil {
-		slog.Warn("failed to update game status", "error", err)
+		log.Warn().Err(err).Msg("failed to update game status")
 	}
 
-	slog.Info("connected to discord")
+	log.Info().Msg("connected to discord")
 }
 
 func DiscordMessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -54,7 +53,7 @@ func DiscordMessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreat
 	}
 
 	response, err := handlers.HandleMessage(message)
-	if err == nil {
+	if err == nil && response != "" {
 		SendDiscordMessage(message.Channel, response)
 	}
 }

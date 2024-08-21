@@ -1,8 +1,6 @@
 package bot
 
 import (
-	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,17 +9,17 @@ import (
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/discord"
 	"github.com/DistroByte/gerry/internal/mumble"
+	"github.com/rs/zerolog/log"
 	"layeh.com/gumble/gumbleutil"
 )
 
 func init() {
-	slog.Info("bot initializing...")
+	log.Info().Msg("bot initializing...")
 }
 
-func Start(configPath string) {
-	config.Load(configPath)
+func Start() {
 	if config.IsEnvironment(config.APP_ENVIRONMENT_TEST) {
-		fmt.Println("app environment is test, aborting startup")
+		log.Info().Msg("app environment is test, aborting startup")
 		return
 	}
 
@@ -35,30 +33,33 @@ func Start(configPath string) {
 
 	addHandlers()
 
+	if config.IsHTTPEndpointEnabled() {
+		go http.ServeHTTP()
+	}
+
 	if config.IsDiscordEnabled() {
 		discord.InitDiscordConnection()
 	}
 
-	if config.IsHTTPEndpointEnabled() {
-		go http.ServeHTTP(config.GetHTTPPort())
-	}
+	log.Info().
+		Str("environment", config.GetEnvironment()).
+		Msg("bot is running. press CTRL+C to exit.")
 
-	slog.Info("bot is running. press CTRL+C to exit.", "environment", config.GetEnvironment())
 	signal.Notify(config.ShutdownChannel, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-config.ShutdownChannel
-	slog.Info("shutting down...")
+	log.Info().Msg("shutting down...")
 
 	if config.IsDiscordEnabled() {
 		discord.DiscordSession.Close()
-		slog.Info("discord closed")
+		log.Info().Msg("discord closed")
 	}
 
 	if config.IsMumbleEnabled() {
 		mumble.MumbleSession.Disconnect()
-		slog.Info("mumble disconnected")
+		log.Info().Msg("mumble disconnected")
 	}
 
-	slog.Info("goodbye")
+	log.Info().Msg("goodbye")
 	os.Exit(0)
 }
 

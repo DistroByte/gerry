@@ -1,20 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/DistroByte/gerry/internal/bot"
 	"github.com/DistroByte/gerry/internal/config"
 )
 
+func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+}
+
 func main() {
 	providedArgs := os.Args[1:]
 
 	if len(providedArgs) == 0 {
-		fmt.Println("no arguments provided")
-		os.Exit(1)
+		log.Fatal().Msg("no arguments provided")
 	}
 
 	switch providedArgs[0] {
@@ -23,12 +29,19 @@ func main() {
 		config.Generate(providedArgs[1])
 
 	case "start":
-		if providedArgs[1] == "" {
-			fmt.Println("no config file provided")
-			os.Exit(1)
+		if len(providedArgs) < 2 {
+			log.Fatal().Msg("no config file provided")
 		}
 
+		config.Load(providedArgs[1])
 		config.StartTime = time.Now()
-		bot.Start(providedArgs[1])
+
+		if config.GetEnvironment() == config.APP_ENVIRONMENT_LOCAL {
+			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+			zerolog.SetGlobalLevel(zerolog.DebugLevel)
+			log.Debug().Msg("running locally in debug mode")
+		}
+
+		bot.Start()
 	}
 }

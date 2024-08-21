@@ -1,19 +1,16 @@
 package mumble
 
 import (
-	"log/slog"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 func SendMumbleMessage(channelID uint32, message string) {
-	if message == "" {
-		slog.Debug("message is empty")
-		return
-	}
 
 	channel := MumbleSession.Channels[channelID]
 	if channel == nil {
-		slog.Warn("channel not found", "channel", channelID)
+		log.Warn().Str("platform", "mumble").Msg("channel not found")
 		return
 	}
 

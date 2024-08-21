@@ -2,18 +2,19 @@ package karting
 
 import (
 	"fmt"
-	"log/slog"
 	"strconv"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (k *Karting) Graph() {
 	if len(k.Drivers) == 0 {
-		slog.Error("no drivers available to generate ELO graph")
+		log.Error().Msg("no drivers available to generate ELO graph")
 		return
 	}
 
@@ -88,7 +89,7 @@ func (k *Karting) Graph() {
 		}
 
 		if firstRaceIndex < 0 {
-			slog.Debug("driver never raced", "driver", driver.Name)
+			log.Debug().Str("driver", driver.Name).Msg("driver never raced")
 			// set the last value to the initial ELO
 			xys[len(xys)-1].X = float64(len(xys) - 1)
 			xys[len(xys)-1].Y = float64(InitialELO)
@@ -102,7 +103,7 @@ func (k *Karting) Graph() {
 		// create a line for the driver
 		line, points, err := plotter.NewLinePoints(xys[firstRaceIndex:])
 		if err != nil {
-			slog.Error("failed to create line", "error", err)
+			log.Error().Err(err).Msg("failed to create plot chart line")
 		}
 
 		// create labels for the line
@@ -111,7 +112,7 @@ func (k *Karting) Graph() {
 			Labels: labels[firstRaceIndex:],
 		})
 		if err != nil {
-			slog.Error("failed to create labels", "error", err)
+			log.Error().Err(err).Msg("failed to create plot chart labels")
 		}
 
 		// style the line and points
@@ -128,18 +129,18 @@ func (k *Karting) Graph() {
 	}
 
 	if err := p.Save(30*vg.Centimeter, 20*vg.Centimeter, "elo.svg"); err != nil {
-		slog.Error("failed to save plot", "error", err)
+		log.Error().Err(err).Str("file", "elo.svg").Msg("failed to save file")
 		return
 	}
 
-	slog.Debug("saved plot to elo.svg")
+	log.Debug().Str("file", "elo.svg").Msg("saved plot to file")
 
 	if err := p.Save(30*vg.Centimeter, 20*vg.Centimeter, "elo.png"); err != nil {
-		slog.Error("failed to save plot", "error", err)
+		log.Error().Err(err).Str("file", "elo.png").Msg("failed to save file")
 		return
 	}
 
-	slog.Debug("saved plot to elo.png")
+	log.Debug().Str("file", "elo.png").Msg("saved plot to file")
 }
 
 type raceTicker struct{}

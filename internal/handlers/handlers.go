@@ -1,17 +1,22 @@
 package handlers
 
 import (
-	"log/slog"
 	"syscall"
 
 	"github.com/DistroByte/gerry/internal/commands"
 	"github.com/DistroByte/gerry/internal/config"
 	"github.com/DistroByte/gerry/internal/models"
 	"github.com/google/shlex"
+	"github.com/rs/zerolog/log"
 )
 
 func HandleMessage(message *models.Message) (string, error) {
-	slog.Info("message", "platform", message.Platform, "content", message.Content, "author", message.Author, "channel", message.Channel)
+	log.Info().
+		Str("platform", message.Platform).
+		Str("content", message.Content).
+		Str("author", message.Author).
+		Str("channel", message.Channel).
+		Msg("received message")
 
 	var cmd string
 	var args []string
@@ -30,7 +35,7 @@ func HandleMessage(message *models.Message) (string, error) {
 	}
 
 	if err != nil {
-		slog.Error("failed to split message", "error", err)
+		log.Error().Err(err).Msg("failed to split message")
 		return "", err
 	}
 

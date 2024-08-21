@@ -1,11 +1,10 @@
 package config
 
 import (
-	"fmt"
-	"log/slog"
 	"os"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -49,23 +48,26 @@ type mumbleConfig struct {
 
 var config *configuration
 
-func Load(path string) {
+func Load(path string) error {
 	if path == "" {
 		path = "config.yaml"
 	}
 
 	file, err := os.Open(path)
 	if err != nil {
-		slog.Error("failed to open config file", "error", err)
-		return
+		log.Error().Err(err).Msg("failed to open config file")
+		return err
 	}
 	defer file.Close()
 
 	config = &defaultConfig
 	if err := yaml.NewDecoder(file).Decode(config); err != nil {
-		slog.Error("failed to decode config file", "error", err)
-		return
+		log.Error().Err(err).Msg("failed to decode config file")
+		return err
 	}
+
+	log.Info().Str("file", path).Msg("config file loaded successfully")
+	return nil
 }
 
 func Generate(filepath string) {
@@ -75,18 +77,18 @@ func Generate(filepath string) {
 
 	file, err := os.Create(filepath)
 	if err != nil {
-		fmt.Println("failed to create config file:", err)
+		log.Error().Err(err).Msg("failed to create config file")
 		return
 	}
 	defer file.Close()
 
-	fmt.Println("writing default config to", filepath)
+	log.Info().Str("file", filepath).Msg("writing default config to file")
 	if err := yaml.NewEncoder(file).Encode(defaultConfig); err != nil {
-		fmt.Println("failed to encode config file:", err)
+		log.Error().Err(err).Msg("failed to encode config file")
 		return
 	}
 
-	fmt.Println("config file generated successfully")
+	log.Info().Msg("config file generated successfully")
 }
 
 func GetEnvironment() string {

@@ -1,13 +1,12 @@
 package karting
 
 import (
-	"encoding/json"
 	"fmt"
 	"image/color"
-	"log/slog"
-	"os"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -67,7 +66,7 @@ func NewKarting() *Karting {
 
 func (k *Karting) Reset() {
 	for _, driver := range k.Drivers {
-		slog.Info("resetting driver", "driver", driver.Name)
+		log.Debug().Str("driver", driver.Name).Msg("resetting driver")
 		driver.ELO = InitialELO
 		driver.ELOChange = 0
 		driver.Stats = &DriverStats{
@@ -79,8 +78,6 @@ func (k *Karting) Reset() {
 		}
 	}
 	k.Races = []Event{}
-
-	save(k)
 }
 
 func (k *Karting) Register(name string) (string, error) {
@@ -104,11 +101,6 @@ func (k *Karting) Register(name string) (string, error) {
 		},
 	})
 
-	err := save(k)
-	if err != nil {
-		return "", err
-	}
-
 	return fmt.Sprintf("registered %q", name), nil
 }
 
@@ -118,51 +110,9 @@ func (k *Karting) Unregister(name string) (string, error) {
 	for i, driver := range k.Drivers {
 		if strings.ToLower(driver.Name) == name {
 			k.Drivers = append(k.Drivers[:i], k.Drivers[i+1:]...)
-			err := save(k)
-			if err != nil {
-				return "", err
-			}
 			return fmt.Sprintf("unregistered %q", name), nil
 		}
 	}
 
 	return "", fmt.Errorf("driver %s not found", name)
-}
-
-func (k *Karting) Load() {
-	slog.Debug("loading karting data")
-	dir, err := os.Getwd()
-	if err != nil {
-		return
-	}
-
-	data, err := os.ReadFile(dir + "/karting.json")
-	if err != nil {
-		slog.Error("failed to read karting data", "error", err)
-	}
-
-	err = json.Unmarshal(data, &k)
-	if err != nil {
-		slog.Error("failed to unmarshal karting data", "error", err)
-	}
-}
-
-func save(karting *Karting) error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	slog.Info("writing karting data to", "file", dir+"/karting.json")
-
-	out, err := json.Marshal(karting)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(dir+"/karting.json", out, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

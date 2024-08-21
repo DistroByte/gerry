@@ -7,6 +7,10 @@ import (
 )
 
 func (k *Karting) Race(results []*Result) ([]RaceDiff, error) {
+	if k == nil || k.Drivers == nil {
+		return nil, fmt.Errorf("no drivers registered")
+	}
+
 	populatedResults := make([]*Result, 0, len(results))
 	raceDiff := make([]RaceDiff, 0, len(results))
 
@@ -104,8 +108,6 @@ func (k *Karting) Race(results []*Result) ([]RaceDiff, error) {
 		Date:    time.Now(),
 	}
 	k.Races = append(k.Races, event)
-
-	save(k)
 
 	return raceDiff, nil
 }
