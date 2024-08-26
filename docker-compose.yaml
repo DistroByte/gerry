@@ -1,0 +1,17 @@
+services:
+  gerry:
+    image: "ghcr.io/distrobyte/gerry:retry"
+    container_name: "gerry"
+    restart: "always"
+    environment:
+      - PROD=true
+    ports:
+      - 8080:8080
+    volumes:
+      - ./gerry:/app
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gerry.entrypoints: "web,websecure"
+      traefik.http.routers.gerry.rule: "Host(`gerry.dbyte.xyz`)"
+      traefik.http.routers.gerry.tls.certresolver: "resolver"
+      logging.promtail: true
