@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func SendMumbleMessage(channelID uint32, message string) {
+func SendMessage(channelID uint32, message string) {
 
 	channel := MumbleSession.Channels[channelID]
 	if channel == nil {

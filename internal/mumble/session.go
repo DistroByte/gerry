@@ -6,10 +6,11 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/DistroByte/gerry/internal/config"
-	"github.com/DistroByte/gerry/internal/handlers"
-	"github.com/DistroByte/gerry/internal/models"
+	"github.com/distrobyte/gerry/internal/config"
+	"github.com/distrobyte/gerry/internal/handlers"
+	"github.com/distrobyte/gerry/internal/models"
 	"github.com/rs/zerolog/log"
 	"layeh.com/gumble/gumble"
 )
@@ -17,7 +18,7 @@ import (
 var MumbleSession *gumble.Client
 var MumbleConfig *gumble.Config
 
-func InitMumbleSession() {
+func InitSession() {
 	if config.GetMumbleHost() != "" {
 		var tlsConfig tls.Config
 		if !config.GetMumbleTLS() {
@@ -43,13 +44,13 @@ func InitMumbleSession() {
 	}
 }
 
-func MumbleReadyHandler(event *gumble.ConnectEvent) {
+func ReadyHandler(event *gumble.ConnectEvent) {
 	log.Info().
 		Str("address", event.Client.Conn.RemoteAddr().String()).
 		Msg("connected to mumble server")
 }
 
-func MumbleMessageCreateHandler(event *gumble.TextMessageEvent) {
+func MessageCreateHandler(event *gumble.TextMessageEvent) {
 	if event.Sender == nil || event.Sender.Name == "" {
 		return
 	}
@@ -68,12 +69,13 @@ func MumbleMessageCreateHandler(event *gumble.TextMessageEvent) {
 		Content:  event.TextMessage.Message,
 		Author:   event.TextMessage.Sender.Name,
 		Channel:  strconv.FormatUint(uint64(event.TextMessage.Sender.Channel.ID), 10),
+		ID:       strconv.FormatInt(time.Now().UnixNano(), 10),
 		Platform: "mumble",
 	}
 
 	response, err := handlers.HandleMessage(message)
 	if err == nil && response != "" {
 		channelIDInt, _ := strconv.ParseInt(message.Channel, 10, 32)
-		SendMumbleMessage(uint32(channelIDInt), response)
+		SendMessage(uint32(channelIDInt), response)
 	}
 }

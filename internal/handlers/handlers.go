@@ -1,14 +1,19 @@
 package handlers
 
 import (
+	"strings"
 	"syscall"
 
-	"github.com/DistroByte/gerry/internal/commands"
-	"github.com/DistroByte/gerry/internal/config"
-	"github.com/DistroByte/gerry/internal/models"
+	"github.com/distrobyte/gerry/internal/commands"
+	"github.com/distrobyte/gerry/internal/config"
+	"github.com/distrobyte/gerry/internal/models"
 	"github.com/google/shlex"
 	"github.com/rs/zerolog/log"
 )
+
+func InitCommands() {
+	commands.InitKarting()
+}
 
 func HandleMessage(message *models.Message) (string, error) {
 	log.Info().
@@ -16,6 +21,7 @@ func HandleMessage(message *models.Message) (string, error) {
 		Str("content", message.Content).
 		Str("author", message.Author).
 		Str("channel", message.Channel).
+		Str("id", message.ID).
 		Msg("received message")
 
 	var cmd string
@@ -24,26 +30,25 @@ func HandleMessage(message *models.Message) (string, error) {
 	prefix := config.GetBotPrefix()
 	args, err := shlex.Split(message.Content)
 
-	if len(args) > 1 {
-		cmd, args = args[0], args[1:]
-
-	} else if len(args) == 1 {
-		cmd = args[0]
-
-	} else {
-		return "", nil
-	}
-
 	if err != nil {
-		log.Error().Err(err).Msg("failed to split message")
-		return "", err
+		if err.Error() == "EOF found when expecting closing quote" {
+			args = strings.Fields(message.Content)
+		} else {
+			log.Error().Err(err).Msg("failed to split message")
+			return "", err
+		}
 	}
 
-	if string(cmd[0:len(prefix)]) != prefix {
+	if len(args) == 0 {
 		return "", nil
 	}
 
-	cmd = cmd[len(prefix):]
+	cmd, ok := strings.CutPrefix(args[0], prefix)
+	if !ok {
+		return "", nil
+	}
+
+	args = args[1:]
 
 	switch cmd {
 	case "ping":
@@ -53,19 +58,13 @@ func HandleMessage(message *models.Message) (string, error) {
 		return commands.EchoCommand(args), nil
 
 	case "karting":
-		switch args[0] {
-		case "race":
-			return commands.KartingRaceCommand(args, *message), nil
-
-		case "stats":
-			return commands.KartingStatsCommand(args, *message), nil
-
-		default:
-			return commands.KartingCommand(args, *message), nil
-		}
+		return commands.KartingCommand(args, *message), nil
 
 	case "uptime":
 		return commands.UptimeCommand(), nil
+
+	case "version":
+		return commands.VersionCommand(args), nil
 
 	case "shutdown":
 		config.ShutdownChannel <- syscall.SIGINT
@@ -75,5 +74,9 @@ func HandleMessage(message *models.Message) (string, error) {
 		break
 	}
 
+	return "", nil
+}
+
+func HandleReaction(message *models.Message) (string, error) {
 	return "", nil
 }

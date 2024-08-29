@@ -49,10 +49,6 @@ type mumbleConfig struct {
 var config *configuration
 
 func Load(path string) error {
-	if path == "" {
-		path = "config.yaml"
-	}
-
 	file, err := os.Open(path)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to open config file")
@@ -71,10 +67,6 @@ func Load(path string) error {
 }
 
 func Generate(filepath string) {
-	if filepath == "" {
-		filepath = "config.yaml"
-	}
-
 	file, err := os.Create(filepath)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create config file")

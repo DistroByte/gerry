@@ -6,16 +6,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/DistroByte/gerry/internal/config"
-	"github.com/DistroByte/gerry/internal/models"
-	"github.com/DistroByte/gerry/karting"
+	"github.com/distrobyte/gerry/internal/config"
+	"github.com/distrobyte/gerry/internal/models"
+	"github.com/distrobyte/gerry/karting"
 	"github.com/rs/zerolog/log"
 )
 
 var league *karting.Karting
 var longestDriverName int
 
-func init() {
+func InitKarting() {
 	// Initialize the karting instance
 	league = karting.NewKarting()
 	load()
@@ -74,6 +74,12 @@ func KartingCommand(args []string, message models.Message) string {
 		} else {
 			return fmt.Sprintf("https://%s/karting.png", config.GetDomain())
 		}
+
+	case "stats":
+		return KartingStatsCommand(args, message)
+
+	case "race":
+		return KartingRaceCommand(args, message)
 
 	case "reset":
 		league.Reset()

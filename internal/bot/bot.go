@@ -1,44 +1,46 @@
 package bot
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/DistroByte/gerry/http"
-	"github.com/DistroByte/gerry/internal/config"
-	"github.com/DistroByte/gerry/internal/discord"
-	"github.com/DistroByte/gerry/internal/mumble"
+	"github.com/distrobyte/gerry/http"
+	"github.com/distrobyte/gerry/internal/config"
+	"github.com/distrobyte/gerry/internal/discord"
+	"github.com/distrobyte/gerry/internal/handlers"
+	"github.com/distrobyte/gerry/internal/mumble"
 	"github.com/rs/zerolog/log"
 	"layeh.com/gumble/gumbleutil"
 )
 
-func init() {
+func Start() error {
 	log.Info().Msg("bot initializing...")
-}
 
-func Start() {
 	if config.IsEnvironment(config.APP_ENVIRONMENT_TEST) {
 		log.Info().Msg("app environment is test, aborting startup")
-		return
+		return fmt.Errorf("app environment is test")
 	}
 
 	if config.IsDiscordEnabled() {
-		discord.InitDiscordSession()
+		discord.InitSession()
 	}
 
 	if config.IsMumbleEnabled() {
-		mumble.InitMumbleSession()
+		mumble.InitSession()
 	}
 
 	addHandlers()
+
+	handlers.InitCommands()
 
 	if config.IsHTTPEndpointEnabled() {
 		go http.ServeHTTP()
 	}
 
 	if config.IsDiscordEnabled() {
-		discord.InitDiscordConnection()
+		discord.InitConnection()
 	}
 
 	log.Info().
@@ -61,7 +63,7 @@ func Start() {
 	}
 
 	log.Info().Msg("goodbye")
-	os.Exit(0)
+	return nil
 }
 
 func addHandlers() {
@@ -69,14 +71,15 @@ func addHandlers() {
 
 	// discord
 	if config.IsDiscordEnabled() {
-		discord.DiscordSession.AddHandler(discord.DiscordReadyHandler)
-		discord.DiscordSession.AddHandler(discord.DiscordMessageCreateHandler)
+		discord.DiscordSession.AddHandler(discord.ReadyHandler)
+		discord.DiscordSession.AddHandler(discord.MessageCreateHandler)
+		discord.DiscordSession.AddHandler(discord.MessageReactHandler)
 	}
 	// mumble
 	if config.IsMumbleEnabled() {
 		mumble.MumbleSession.Config.Attach(gumbleutil.Listener{
-			Connect:     mumble.MumbleReadyHandler,
-			TextMessage: mumble.MumbleMessageCreateHandler,
+			Connect:     mumble.ReadyHandler,
+			TextMessage: mumble.MessageCreateHandler,
 		})
 	}
 }

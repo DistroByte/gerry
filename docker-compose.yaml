@@ -1,17 +1,17 @@
 services:
-  gerry:
-    image: "ghcr.io/distrobyte/gerry:retry"
-    container_name: "gerry"
-    restart: "always"
-    environment:
-      - PROD=true
-    ports:
-      - 8080:8080
-    volumes:
-      - ./gerry:/app
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.gerry.entrypoints: "web,websecure"
-      traefik.http.routers.gerry.rule: "Host(`gerry.dbyte.xyz`)"
-      traefik.http.routers.gerry.tls.certresolver: "resolver"
-      logging.promtail: true
+    gerry:
+        image: "ghcr.io/distrobyte/gerry:d74428c7a30e2db9984472e1d8fedde1686f95ec"
+        container_name: "gerry"
+        restart: "always"
+        environment:
+            - PROD=true
+        ports:
+            - 8080:8080
+        volumes:
+            - ./:/app
+        labels:
+            traefik.enable: "true"
+            traefik.http.routers.gerry.entrypoints: "web,websecure"
+            traefik.http.routers.gerry.rule: "Host(`gerry.dbyte.xyz`)"
+            traefik.http.routers.gerry.tls.certresolver: "resolver"
+            logging.promtail: true
