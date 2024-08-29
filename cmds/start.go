@@ -19,7 +19,11 @@ func newStartCommand() *cobra.Command {
 		Long:  "Start the bot with the provided config file",
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config.Load(cmd.Flag("config").Value.String())
+			err := config.Load(cmd.Flag("config").Value.String())
+			if err != nil {
+				return err
+			}
+
 			config.StartTime = time.Now()
 
 			zerolog.TimeFieldFormat = zerolog.TimeFormatUnix

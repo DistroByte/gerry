@@ -53,12 +53,20 @@ func Start() error {
 	log.Info().Msg("shutting down...")
 
 	if config.IsDiscordEnabled() {
-		discord.DiscordSession.Close()
+		err := discord.DiscordSession.Close()
+		if err != nil {
+			log.Error().Err(err).Msg("discord close error")
+		}
+
 		log.Info().Msg("discord closed")
 	}
 
 	if config.IsMumbleEnabled() {
-		mumble.MumbleSession.Disconnect()
+		err := mumble.MumbleSession.Disconnect()
+		if err != nil {
+			log.Error().Err(err).Msg("mumble disconnect error")
+		}
+
 		log.Info().Msg("mumble disconnected")
 	}
 

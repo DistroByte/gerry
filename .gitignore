@@ -1,7 +1,6 @@
 tmp/
 build/
 .env
-.vscode
 logs/.vscode/
 __debug_*
 config.yaml

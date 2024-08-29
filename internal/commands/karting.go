@@ -50,7 +50,10 @@ func KartingCommand(args []string, message models.Message) string {
 			longestDriverName = len(args[1])
 		}
 
-		save()
+		err = save()
+		if err != nil {
+			return err.Error()
+		}
 		return res
 
 	case "unregister":
@@ -63,7 +66,10 @@ func KartingCommand(args []string, message models.Message) string {
 			return err.Error()
 		}
 
-		save()
+		err = save()
+		if err != nil {
+			return err.Error()
+		}
 		return res
 
 	case "graph":
@@ -83,7 +89,10 @@ func KartingCommand(args []string, message models.Message) string {
 
 	case "reset":
 		league.Reset()
-		save()
+		err := save()
+		if err != nil {
+			return err.Error()
+		}
 		return "karting stats have been reset"
 
 	default:
@@ -152,7 +161,10 @@ func KartingRaceCommand(args []string, message models.Message) string {
 
 	// update the graph
 	league.Graph()
-	save()
+	err = save()
+	if err != nil {
+		return err.Error()
+	}
 
 	return response
 }

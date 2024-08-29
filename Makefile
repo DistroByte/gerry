@@ -11,23 +11,26 @@ LDFLAGS:=-X ${COMMANDS_PATH}.GitCommit=${GIT_COMMIT} \
 	-X ${COMMANDS_PATH}.GitExactTag=${GIT_EXACT_TAG} \
 	-X ${COMMANDS_PATH}.BuildDate=${BUILD_DATE}
 
-.PHONY: build docker run test watch config
+.PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" .
+	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o bin/gerry .
 
 .PHONY: debug-build
 debug-build:
-	go build -ldflags "$(LDFLAGS)" -gcflags=all="-N -l" .
+	go build -ldflags "$(LDFLAGS)" -gcflags=all="-N -l" -o bin/gerry .
 
 .PHONY: install
 install:
 	go install -ldflags "$(LDFLAGS)" .
 
+.PHONY: docker
 docker: build
 	@docker build -t ghcr.io/distrobyte/gerry:$(GIT_COMMIT) .
 
+.PHONY: test
 test:
 	go test -v -bench=. ./...
 
+.PHONY: watch
 watch:
 	air start
