@@ -2,7 +2,7 @@
 
 Platform agnostic chatbot.
 
-[![Go report](https://goreportcard.com/badge/git.dbyte.xyz/distro/gerry)](http://goreportcard.com/report/git.dbyte.xyz/distro/gerry)
+[![Go report](https://goreportcard.com/badge/github.com/distrobyte/gerry)](http://goreportcard.com/report/github.com/distrobyte/gerry)
 
 ## Getting Started
 
