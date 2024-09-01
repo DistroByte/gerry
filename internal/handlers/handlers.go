@@ -16,14 +16,6 @@ func InitCommands() {
 }
 
 func HandleMessage(message *models.Message) (string, error) {
-	log.Info().
-		Str("platform", message.Platform).
-		Str("event", "message").
-		Str("content", message.Content).
-		Str("author", message.Author).
-		Str("channel", message.Channel).
-		Str("id", message.ID).
-		Msg("received message")
 
 	var cmd string
 	var args []string

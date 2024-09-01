@@ -1,6 +1,8 @@
 package discord
 
 import (
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/distrobyte/gerry/internal/handlers"
@@ -59,16 +61,28 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	message := &models.Message{
-		Content:  m.Content,
-		Author:   m.Author.Username,
-		Channel:  m.ChannelID,
-		ID:       m.ID,
-		Platform: "discord",
+		Content:    m.Content,
+		Author:     m.Author.Username,
+		Channel:    m.ChannelID,
+		ID:         m.ID,
+		RecievedAt: time.Now(),
+		Platform:   "discord",
 	}
 
 	response, err := handlers.HandleMessage(message)
 	if err == nil && response != "" {
 		SendMessage(message.Channel, response)
+		log.Info().
+			Str("platform", message.Platform).
+			Str("event", "message").
+			Str("content", message.Content).
+			Str("author", message.Author).
+			Str("channel", message.Channel).
+			Str("id", message.ID).
+			TimeDiff("duration", time.Now(), message.RecievedAt).
+			Msg("handled message")
+	} else if err != nil {
+		log.Error().Err(err).Msg("failed to handle message")
 	}
 }
 
