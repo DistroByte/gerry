@@ -26,7 +26,6 @@ func InitSession() {
 		discordgo.IntentsGuildVoiceStates |
 		discordgo.IntentsDirectMessages
 
-	// set all discordgo.State properties to true
 	DiscordSession.State.MaxMessageCount = 200
 	DiscordSession.State.TrackChannels = true
 	DiscordSession.State.TrackThreads = true
@@ -36,7 +35,6 @@ func InitSession() {
 	DiscordSession.State.TrackRoles = true
 	DiscordSession.State.TrackVoice = true
 	DiscordSession.State.TrackPresences = true
-
 }
 
 func InitConnection() {
