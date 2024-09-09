@@ -74,7 +74,11 @@ func KartingCommand(args []string, message models.Message) string {
 		return "driver unregistered"
 
 	case "graph":
-		league.GenerateGraph()
+		_, err := league.GenerateGraph()
+		if err != nil {
+			return err.Error()
+		}
+
 		// return the URL to the graph
 		if config.IsEnvironment(config.APP_ENVIRONMENT_LOCAL) {
 			return fmt.Sprintf("http://localhost:%d/karting", config.GetHTTPPort())
