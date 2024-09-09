@@ -170,7 +170,11 @@ func KartingRaceCommand(args []string, message models.Message) string {
 	response += "```"
 
 	// update the graph
-	league.GenerateGraph()
+	_, err = league.GenerateGraph()
+	if err != nil {
+		return err.Error()
+	}
+
 	err = save()
 	if err != nil {
 		return err.Error()
