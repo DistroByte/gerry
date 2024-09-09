@@ -5,25 +5,26 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/distrobyte/gerry/internal/models"
-	"github.com/distrobyte/gerry/karting"
+	"github.com/distrobyte/multielo"
 	"github.com/rs/zerolog/log"
 )
 
-var league *karting.Karting
-var longestDriverName int
+var league *multielo.League
+var longestPlayerName int
 
 func InitKarting() {
 	// Initialize the karting instance
-	league = karting.NewKarting()
+	league = multielo.NewLeague()
 	load()
 
 	// Find the longest driver name
-	for _, driver := range league.Drivers {
-		if len(driver.Name) > longestDriverName {
-			longestDriverName = len(driver.Name)
+	for _, driver := range league.Players {
+		if len(driver.Name) > longestPlayerName {
+			longestPlayerName = len(driver.Name)
 		}
 	}
 }
@@ -40,28 +41,28 @@ func KartingCommand(args []string, message models.Message) string {
 			return "karting register command requires a driver name"
 		}
 
-		res, err := league.Register(args[1])
+		err := league.AddPlayer(args[1])
 		if err != nil {
 			return err.Error()
 		}
 
 		// update the longest driver name for formatting
-		if len(args[1]) > longestDriverName {
-			longestDriverName = len(args[1])
+		if len(args[1]) > longestPlayerName {
+			longestPlayerName = len(args[1])
 		}
 
 		err = save()
 		if err != nil {
 			return err.Error()
 		}
-		return res
+		return "driver registered"
 
 	case "unregister":
 		if len(args) < 2 {
 			return "karting unregister command requires a driver name"
 		}
 
-		res, err := league.Unregister(args[1])
+		err := league.RemovePlayer(args[1])
 		if err != nil {
 			return err.Error()
 		}
@@ -70,10 +71,10 @@ func KartingCommand(args []string, message models.Message) string {
 		if err != nil {
 			return err.Error()
 		}
-		return res
+		return "driver unregistered"
 
 	case "graph":
-		league.Graph()
+		league.GenerateGraph()
 		// return the URL to the graph
 		if config.IsEnvironment(config.APP_ENVIRONMENT_LOCAL) {
 			return fmt.Sprintf("http://localhost:%d/karting", config.GetHTTPPort())
@@ -88,11 +89,16 @@ func KartingCommand(args []string, message models.Message) string {
 		return KartingRaceCommand(args, message)
 
 	case "reset":
-		league.Reset()
+		league.ResetPlayers()
+		league.ResetMatches()
+
 		err := save()
 		if err != nil {
 			return err.Error()
 		}
+
+		load()
+
 		return "karting stats have been reset"
 
 	default:
@@ -105,19 +111,19 @@ func KartingCommand(args []string, message models.Message) string {
 }
 
 func KartingStatsCommand(args []string, message models.Message) string {
-	response := fmt.Sprintf("# Karting stats\n```Rating | %-*s | Won | Total | Win %%  | Last 5 avg (all time) | Peak ELO\n", longestDriverName, "Driver")
-	response += "------ | " + fmt.Sprintf("%s | --- | ----- | ------ | --------------------- | --------\n", strings.Repeat("-", longestDriverName))
+	response := fmt.Sprintf("# Karting stats\n```Rating | %-*s | Won | Total | Win %%  | Last 5 avg (all time) | Peak ELO\n", longestPlayerName, "Driver")
+	response += "------ | " + fmt.Sprintf("%s | --- | ----- | ------ | --------------------- | --------\n", strings.Repeat("-", longestPlayerName))
 
-	for i := 0; i < len(league.Drivers); i++ {
-		for j := i + 1; j < len(league.Drivers); j++ {
-			if league.Drivers[i].ELO < league.Drivers[j].ELO {
-				league.Drivers[i], league.Drivers[j] = league.Drivers[j], league.Drivers[i]
+	for i := 0; i < len(league.Players); i++ {
+		for j := i + 1; j < len(league.Players); j++ {
+			if league.Players[i].ELO < league.Players[j].ELO {
+				league.Players[i], league.Players[j] = league.Players[j], league.Players[i]
 			}
 		}
 	}
 
-	for _, driver := range league.Drivers {
-		winRate := float64(driver.Stats.TotalWins) / float64(driver.Stats.TotalRaces) * 100
+	for _, driver := range league.Players {
+		winRate := float64(driver.Stats.MatchesWon) / float64(driver.Stats.MatchesPlayed) * 100
 
 		var last5 float64
 		for _, finish := range driver.Stats.Last5Finish {
@@ -125,8 +131,8 @@ func KartingStatsCommand(args []string, message models.Message) string {
 		}
 		last5 /= 5
 
-		response += fmt.Sprintf("%6d | %-*s | %3d | %5d | %5.2f%% | %21s | %8d\n", driver.ELO, longestDriverName, driver.Name, driver.Stats.TotalWins, driver.Stats.TotalRaces, winRate,
-			fmt.Sprintf("%.2f (%.2f)", last5, driver.Stats.AllTimeAverageFinish/float64(driver.Stats.TotalRaces)), driver.Stats.PeakELO)
+		response += fmt.Sprintf("%6d | %-*s | %3d | %5d | %5.2f%% | %21s | %8d\n", driver.ELO, longestPlayerName, driver.Name, driver.Stats.MatchesWon, driver.Stats.MatchesPlayed, winRate,
+			fmt.Sprintf("%.2f (%.2f)", last5, driver.Stats.AllTimeAveragePlace/float64(driver.Stats.MatchesPlayed)), driver.Stats.PeakELO)
 	}
 
 	response += "```"
@@ -139,28 +145,28 @@ func KartingRaceCommand(args []string, message models.Message) string {
 		return "please provide a list of drivers"
 	}
 
-	var results []*karting.Result
+	var results []*multielo.MatchResult
 	for i, driver := range args[1:] {
-		results = append(results, &karting.Result{
+		results = append(results, &multielo.MatchResult{
 			Position: i + 1,
-			Driver:   &karting.Driver{Name: driver},
+			Player:   &multielo.Player{Name: driver},
 		})
 	}
 
-	raceDiff, err := league.Race(results)
+	raceDiff, err := league.AddMatch(time.Now(), results...)
 	if err != nil {
 		return err.Error()
 	}
 
 	response := "# Race results\n"
-	response += fmt.Sprintf("```%*s | Rating change\n", longestDriverName, "Driver")
+	response += fmt.Sprintf("```%*s | Rating change\n", longestPlayerName, "Driver")
 	for _, diff := range raceDiff {
-		response += fmt.Sprintf("%*s | %d -> %d (%+d)\n", longestDriverName, diff.Driver.Name, diff.Driver.ELO-diff.Change, diff.Driver.ELO, diff.Change)
+		response += fmt.Sprintf("%*s | %d -> %d (%+d)\n", longestPlayerName, diff.Player.Name, diff.Player.ELO-diff.Player.ELOChange, diff.Player.ELO, diff.Diff)
 	}
 	response += "```"
 
 	// update the graph
-	league.Graph()
+	league.GenerateGraph()
 	err = save()
 	if err != nil {
 		return err.Error()

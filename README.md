@@ -6,14 +6,6 @@ Platform agnostic chatbot.
 
 ## Getting Started
 
-### Generate Config
-
-```bash
-$ make config
-```
-
-This will output a `config.yaml` file in the root of the project. Edit this file to your liking.
-
 ### Run
 
 ```bash
