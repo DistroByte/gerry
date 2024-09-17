@@ -16,12 +16,14 @@ import (
 var league *multielo.League
 var longestPlayerName int
 
-func init() {
+func InitKarting() {
 	// Initialize the karting instance
 	league = multielo.NewLeague()
 
-	log.Info().Msg("loading initial karting data")
-	load()
+	err := load()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load karting data")
+	}
 
 	// Find the longest driver name
 	for _, driver := range league.Players {
@@ -207,20 +209,24 @@ func save() error {
 	return nil
 }
 
-func load() {
-	log.Debug().Msg("loading karting data")
+func load() error {
+	log.Info().Msg("loading karting data")
 	dir, err := os.Getwd()
 	if err != nil {
-		return
+		return err
 	}
 
 	data, err := os.ReadFile(dir + "/karting.json")
 	if err != nil {
 		log.Error().Err(err).Msg("failed to read karting data")
+		return err
 	}
 
 	err = json.Unmarshal(data, &league)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to unmarshal karting data")
+		return err
 	}
+
+	return nil
 }
