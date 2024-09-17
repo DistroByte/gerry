@@ -19,6 +19,8 @@ var longestPlayerName int
 func InitKarting() {
 	// Initialize the karting instance
 	league = multielo.NewLeague()
+
+	log.Info().Msg("loading initial karting data")
 	load()
 
 	// Find the longest driver name
