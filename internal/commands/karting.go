@@ -16,7 +16,7 @@ import (
 var league *multielo.League
 var longestPlayerName int
 
-func InitKarting() {
+func init() {
 	// Initialize the karting instance
 	league = multielo.NewLeague()
 

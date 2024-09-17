@@ -11,10 +11,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func InitCommands() {
-	commands.InitKarting()
-}
-
 func HandleMessage(message *models.Message) (string, error) {
 
 	var cmd string

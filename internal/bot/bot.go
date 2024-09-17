@@ -9,7 +9,6 @@ import (
 	"github.com/distrobyte/gerry/http"
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/distrobyte/gerry/internal/discord"
-	"github.com/distrobyte/gerry/internal/handlers"
 	"github.com/distrobyte/gerry/internal/mumble"
 	"github.com/rs/zerolog/log"
 	"layeh.com/gumble/gumbleutil"
@@ -32,8 +31,6 @@ func Start() error {
 	}
 
 	addHandlers()
-
-	handlers.InitCommands()
 
 	if config.IsHTTPEndpointEnabled() {
 		go http.ServeHTTP()
