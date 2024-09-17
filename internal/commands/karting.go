@@ -105,7 +105,10 @@ func KartingCommand(args []string, message models.Message) string {
 			return err.Error()
 		}
 
-		load()
+		err = load()
+		if err != nil {
+			return err.Error()
+		}
 
 		return "karting stats have been reset"
 
@@ -198,11 +201,13 @@ func save() error {
 
 	out, err := json.Marshal(league)
 	if err != nil {
+		log.Error().Err(err).Msg("failed to marshal karting data")
 		return err
 	}
 
 	err = os.WriteFile(dir+"/karting.json", out, 0644)
 	if err != nil {
+		log.Error().Err(err).Msg("failed to write karting data")
 		return err
 	}
 
