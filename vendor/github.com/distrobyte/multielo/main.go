@@ -336,7 +336,7 @@ func (l *League) GenerateGraph() (string, error) {
 			for _, result := range event.Results {
 
 				// if the result is for the driver we're plotting
-				if result.Player.Name == player.Name {
+				if result.Player != nil && result.Player.Name == player.Name {
 
 					// and this is the first time we've seen them
 					if firstRaceIndex < 0 {

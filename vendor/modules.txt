@@ -11,7 +11,7 @@ github.com/bwmarrin/discordgo
 ## explicit
 github.com/campoy/embedmd
 github.com/campoy/embedmd/embedmd
-# github.com/distrobyte/multielo v0.0.3
+# github.com/distrobyte/multielo v0.0.4
 ## explicit; go 1.23.0
 github.com/distrobyte/multielo
 # github.com/go-fonts/liberation v0.3.3
