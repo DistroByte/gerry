@@ -35,6 +35,7 @@ func initHTTPServer() {
 	mux.HandleFunc("GET /health", healthHandler)
 	mux.HandleFunc("GET /karting", kartingHandler)
 	mux.HandleFunc("GET /karting.png", kartingPNGHandler)
+	mux.HandleFunc("GET /karting.json", kartingJSONHandler)
 	mux.HandleFunc("GET /*", notFoundHandler)
 	mux.HandleFunc("/*", methodNotAllowedHandler)
 
@@ -67,6 +68,11 @@ func kartingHandler(w http.ResponseWriter, r *http.Request) {
 func kartingPNGHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/png")
 	http.ServeFile(w, r, "elo.png")
+}
+
+func kartingJSONHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	http.ServeFile(w, r, "karting.json")
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {

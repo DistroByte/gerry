@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/distrobyte/gerry/internal/models"
@@ -164,7 +163,7 @@ func KartingRaceCommand(args []string, message models.Message) string {
 		})
 	}
 
-	raceDiff, err := league.AddMatch(time.Now(), results...)
+	raceDiff, err := league.AddMatch(results)
 	if err != nil {
 		return err.Error()
 	}

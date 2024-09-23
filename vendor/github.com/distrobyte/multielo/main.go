@@ -81,7 +81,7 @@ func NewLeague() *League {
 	}
 }
 
-func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff, error) {
+func (l *League) AddMatch(results []*MatchResult) ([]MatchDiff, error) {
 	if len(l.Players) == 0 {
 		return nil, ErrNoPlayers
 	}
@@ -89,7 +89,7 @@ func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff,
 	populatedResults := make([]*MatchResult, 0, len(results))
 	matchDiff := make([]MatchDiff, 0, len(results))
 
-	// ensure all drivers are registered and flesh out the results with ELOs
+	// ensure all players are registered and flesh out the results with ELOs
 	for _, result := range results {
 		found := false
 		for _, player := range l.Players {
@@ -125,7 +125,7 @@ func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff,
 
 		// loop over every other result
 		for opponentPlayer, opponentResult := range populatedResults {
-			// skip comparing the driver to themselves
+			// skip comparing the player to themselves
 			if player == opponentPlayer {
 				continue
 			}
@@ -136,9 +136,11 @@ func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff,
 			// calculate the expected score
 			var S float64
 
-			// if the driver finished higher than the other driver
+			// if the player finished higher than the other player
 			if curPosition < opponentPosition {
 				S = 1.0
+			} else if curPosition == opponentPosition {
+				S = 0.5
 			} else {
 				S = 0.0
 			}
@@ -146,11 +148,11 @@ func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff,
 			// calculate the expected score
 			E := 1.0 / (1.0 + math.Pow(10, float64(opponentELO-curELO)/400))
 
-			// update the driver's ELO change
+			// update the player's ELO change
 			result.Player.ELOChange += int(math.Round(float64(kValue) * (S - E)))
 		}
 
-		// update the driver's ELO
+		// update the player's ELO
 		result.Player.ELO += result.Player.ELOChange
 		matchDiff = append(matchDiff, MatchDiff{
 			Player: result.Player,
@@ -158,13 +160,12 @@ func (l *League) AddMatch(date time.Time, results ...*MatchResult) ([]MatchDiff,
 		})
 	}
 
-	// update the drivers' ELOs
+	// update the players' ELOs
 	for _, result := range populatedResults {
 		for _, player := range l.Players {
 			if player.Name == result.Player.Name {
 				player.ELO = result.Player.ELO
-
-				player.Stats.MatchesPlayed += 1
+				player.Stats.MatchesPlayed++
 				if result.Position == 1 {
 					player.Stats.MatchesWon++
 				}
@@ -256,7 +257,14 @@ func (l *League) RemovePlayer(name string) error {
 func (l *League) ResetPlayers() {
 	for _, p := range l.Players {
 		p.ELO = InitialELO
-		p.Stats = &PlayerStats{}
+		p.ELOChange = 0
+		p.Stats = &PlayerStats{
+			Last5Finish:         []int{},
+			MatchesPlayed:       0,
+			MatchesWon:          0,
+			AllTimeAveragePlace: 0,
+			PeakELO:             InitialELO,
+		}
 	}
 }
 
@@ -295,7 +303,7 @@ func (l *League) GenerateGraph() (string, error) {
 		return "", ErrNoPlayers
 	}
 
-	// sort the drivers by ELO
+	// sort the players by ELO
 	for i := 0; i < len(l.Players); i++ {
 		for j := i + 1; j < len(l.Players); j++ {
 			if l.Players[i].ELO < l.Players[j].ELO {
@@ -329,13 +337,13 @@ func (l *League) GenerateGraph() (string, error) {
 
 		var firstRaceIndex int = -1
 
-		// loop over every race
+		// loop over every match
 		for i, event := range l.Matches {
 
 			// loop over every result
 			for _, result := range event.Results {
 
-				// if the result is for the driver we're plotting
+				// if the result is for the player we're plotting
 				if result.Player != nil && result.Player.Name == player.Name {
 
 					// and this is the first time we've seen them
@@ -344,16 +352,15 @@ func (l *League) GenerateGraph() (string, error) {
 						xys[i].X = float64(i)
 						xys[i].Y = float64(InitialELO)
 						labels[i] = strconv.Itoa(InitialELO)
-						// and remember the index
 						firstRaceIndex = i
 					}
 
-					// add the ELO for the driver for the current race
+					// add the ELO for the player for the current race
 					xys[i+1].X = float64(i + 1)
 					xys[i+1].Y = float64(result.Player.ELO)
 					break
 				} else {
-					// if we haven't seen the driver yet, just copy the last value
+					// if we haven't seen the player yet, just copy the last value
 					xys[i+1].X = float64(i)
 					xys[i+1].Y = xys[i].Y
 				}
