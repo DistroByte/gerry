@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -33,6 +35,8 @@ jobs:
           tags: |
             type=sha,format=long
             type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern=v[0-9]+.[0-9]+.[0-9]+
           flavor: |
             latest=auto
 
