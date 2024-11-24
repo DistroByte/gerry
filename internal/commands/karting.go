@@ -21,7 +21,7 @@ func InitKarting() {
 
 	err := load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load karting data")
+		log.Error().Err(err).Msg("failed to load karting data")
 	}
 
 	// Find the longest driver name
