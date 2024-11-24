@@ -51,7 +51,8 @@ var config *configuration
 func Load(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to open config file")
+		log.Error().Err(err).Msg("failed to open config file, creating empty file")
+		Generate(path)
 		return err
 	}
 	defer file.Close()
