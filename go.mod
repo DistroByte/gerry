@@ -24,7 +24,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/image v0.20.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gonum.org/v1/plot v0.14.0 // indirect
 )
 
@@ -36,7 +36,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/spf13/cobra v1.8.1
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
