@@ -2,6 +2,13 @@ name: Build and push
 
 on:
   push:
+    branches:
+      - master
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
 
 env:
   REGISTRY: ghcr.io
@@ -28,18 +35,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # generate tags and labels for the Docker image
+      # should contain the commit SHA, the branch name, and a tag if the commit is tagged, and latest
       - name: Docker metadata
         uses: docker/metadata-action@v5
         id: meta
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,format=long
             type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern=v[0-9]+.[0-9]+.[0-9]+
-          flavor: |
-            latest=auto
+            type=ref,event=pr
+            type=sha,format=long,prefix=
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: Setup Go
         uses: actions/setup-go@v5
