@@ -1,9 +1,11 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/distrobyte/gerry/internal/config"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
@@ -33,19 +35,22 @@ func initHTTPServer() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /health", healthHandler)
-	mux.HandleFunc("GET /karting", kartingHandler)
+	mux.HandleFunc("GET /karting", kartingHTMLHandler)
+	mux.HandleFunc("GET /karting.svg", kartingSVGHandler)
 	mux.HandleFunc("GET /karting.png", kartingPNGHandler)
 	mux.HandleFunc("GET /karting.json", kartingJSONHandler)
 	mux.HandleFunc("GET /*", notFoundHandler)
 	mux.HandleFunc("/*", methodNotAllowedHandler)
 
 	http.Handle("/", c.Then(mux))
+
+	log.Info().Msg("http server initialized. listening on port " + fmt.Sprintf("%d", config.GetHTTPPort()))
 }
 
 func ServeHTTP() {
 	initHTTPServer()
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", config.GetHTTPPort()), nil)
 	if err != nil {
 		log.Fatal().Err(err).Msg("")
 	}
@@ -60,7 +65,30 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func kartingHandler(w http.ResponseWriter, r *http.Request) {
+func kartingHTMLHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	htmlContent := `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Karting SVG</title>
+        <script defer data-domain="gerry.dbyte.xyz" src="https://plausible.dbyte.xyz/js/script.js"></script>
+    </head>
+    <body>
+        <object type="image/svg+xml" data="karting.svg"></object>
+    </body>
+    </html>`
+
+	_, err := w.Write([]byte(htmlContent))
+	if err != nil {
+		hlog.FromRequest(r).Error().Err(err).Msg("")
+		return
+	}
+}
+
+func kartingSVGHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 	http.ServeFile(w, r, "elo.svg")
 }

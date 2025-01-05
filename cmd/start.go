@@ -1,4 +1,4 @@
-package cmds
+package cmd
 
 import (
 	"os"
@@ -12,7 +12,7 @@ import (
 	"github.com/distrobyte/gerry/internal/config"
 )
 
-func newStartCommand() *cobra.Command {
+func NewStartCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start the bot",

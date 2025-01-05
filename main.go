@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/distrobyte/gerry/cmds"
+	"github.com/distrobyte/gerry/cmd"
 )
 
 func main() {
-	cmds.Execute()
+	cmd.Execute()
 }

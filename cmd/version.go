@@ -1,4 +1,4 @@
-package cmds
+package cmd
 
 import (
 	"runtime"
@@ -13,7 +13,7 @@ type versionOptions struct {
 	all    bool
 }
 
-func newVersionCommand() *cobra.Command {
+func NewVersionCommand() *cobra.Command {
 	options := &versionOptions{}
 
 	cmd := &cobra.Command{

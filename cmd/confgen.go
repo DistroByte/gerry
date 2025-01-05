@@ -1,11 +1,11 @@
-package cmds
+package cmd
 
 import (
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/spf13/cobra"
 )
 
-func newConfgenCommand() *cobra.Command {
+func NewConfgenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "confgen",
 		Short: "Generate a config file",

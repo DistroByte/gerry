@@ -1,4 +1,4 @@
-package cmds
+package cmd
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRootCmd() *cobra.Command {
+func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gerry",
 		Short: "Gerry is a platform-agnostic bot",
@@ -32,9 +32,9 @@ func NewRootCmd() *cobra.Command {
 		cmd.AddCommand(child)
 	}
 
-	addCmd(newVersionCommand())
-	addCmd(newStartCommand())
-	addCmd(newConfgenCommand())
+	addCmd(NewVersionCommand())
+	addCmd(NewStartCommand())
+	addCmd(NewConfgenCommand())
 
 	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
@@ -42,7 +42,7 @@ func NewRootCmd() *cobra.Command {
 }
 
 func Execute() {
-	if err := NewRootCmd().Execute(); err != nil {
+	if err := RootCmd().Execute(); err != nil {
 		os.Exit(1)
 	}
 }
