@@ -7,7 +7,7 @@ require (
 	github.com/distrobyte/multielo v0.0.5
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/justinas/alice v1.2.0
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	gopkg.in/yaml.v3 v3.0.1
 	layeh.com/gumble v0.0.0-20221205141517-d1df60a3cc14
 )
