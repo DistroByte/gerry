@@ -6,45 +6,67 @@ import (
 	"time"
 
 	"github.com/distrobyte/gerry/internal/config"
-	"github.com/justinas/alice"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/google/uuid"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )
 
 func initHTTPServer() {
-	c := alice.New()
 
-	c = c.Append(hlog.NewHandler(log.Logger.With().Str("component", "http").Logger()))
+	r := chi.NewRouter()
+	r.Use(requestIDMiddleware)
+	r.Use(zerologMiddleware)
 
-	c = c.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
-		hlog.FromRequest(r).Info().
-			Str("method", r.Method).
-			Stringer("url", r.URL).
-			Str("Cf-Connecting-Ip", r.Header.Get("Cf-Connecting-Ip")).
-			Int("status", status).
-			Int("size", size).
-			Dur("duration", duration).
-			Msg("")
-	}))
-	c = c.Append(hlog.RemoteAddrHandler("ip"))
-	c = c.Append(hlog.UserAgentHandler("user-agent"))
-	c = c.Append(hlog.RequestIDHandler("req_id", "Request-Id"))
-	c = c.Append(hlog.RefererHandler("referer"))
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		// use the kartingHTML handler to serve the main page
+		kartingHTMLHandler(w, r)
+	})
 
-	// create a new mux
-	mux := http.NewServeMux()
+	r.Get("/health", healthHandler)
+	r.Get("/karting", kartingHTMLHandler)
+	r.Get("/karting.svg", kartingSVGHandler)
+	r.Get("/karting.png", kartingPNGHandler)
+	r.Get("/karting.json", kartingJSONHandler)
+	r.NotFound(notFoundHandler)
+	r.MethodNotAllowed(methodNotAllowedHandler)
 
-	mux.HandleFunc("GET /health", healthHandler)
-	mux.HandleFunc("GET /karting", kartingHTMLHandler)
-	mux.HandleFunc("GET /karting.svg", kartingSVGHandler)
-	mux.HandleFunc("GET /karting.png", kartingPNGHandler)
-	mux.HandleFunc("GET /karting.json", kartingJSONHandler)
-	mux.HandleFunc("GET /*", notFoundHandler)
-	mux.HandleFunc("/*", methodNotAllowedHandler)
+	log.Info().Msgf("Starting server on port %d", config.GetHTTPPort())
+	log.Fatal().Err(http.ListenAndServe(fmt.Sprintf(":%d", config.GetHTTPPort()), r)).Msg("")
+	log.Info().Msgf("Server started on port %d", config.GetHTTPPort())
+}
 
-	http.Handle("/", c.Then(mux))
+func requestIDMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestID := uuid.New().String()
+		logger := log.With().Str("request_id", requestID).Logger()
+		r = r.WithContext(logger.WithContext(r.Context()))
+		w.Header().Set("X-Request-ID", requestID)
+		next.ServeHTTP(w, r)
+	})
+}
 
-	log.Info().Msg("http server initialized. listening on port " + fmt.Sprintf("%d", config.GetHTTPPort()))
+func zerologMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+
+		logger := zerolog.Ctx(r.Context())
+		defer func() {
+			logger.Info().
+				Str("method", r.Method).
+				Str("path", r.URL.Path).
+				Int("status", ww.Status()).
+				Int("bytes", ww.BytesWritten()).
+				Str("remote", r.RemoteAddr).
+				Dur("duration", time.Since(start)).
+				Msg("handled request")
+		}()
+
+		next.ServeHTTP(ww, r)
+	})
 }
 
 func ServeHTTP() {
@@ -66,6 +88,11 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func kartingHTMLHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		methodNotAllowedHandler(w, r)
+		return
+	}
+
 	w.Header().Set("Content-Type", "text/html")
 	htmlContent := `
     <!DOCTYPE html>
@@ -84,7 +111,6 @@ func kartingHTMLHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte(htmlContent))
 	if err != nil {
 		hlog.FromRequest(r).Error().Err(err).Msg("")
-		return
 	}
 }
 

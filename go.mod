@@ -5,8 +5,9 @@ go 1.23.0
 require (
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/distrobyte/multielo v0.0.5
+	github.com/go-chi/chi/v5 v5.2.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/justinas/alice v1.2.0
+	github.com/google/uuid v1.6.0
 	github.com/rs/zerolog v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
 	layeh.com/gumble v0.0.0-20221205141517-d1df60a3cc14
