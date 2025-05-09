@@ -101,7 +101,6 @@ func kartingHTMLHandler(w http.ResponseWriter, r *http.Request) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Karting SVG</title>
-        <script defer data-domain="gerry.dbyte.xyz" src="https://plausible.dbyte.xyz/js/script.js"></script>
     </head>
     <body>
         <object type="image/svg+xml" data="karting.svg"></object>
