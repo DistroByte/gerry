@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.24.1
 
 require (
-	github.com/bwmarrin/discordgo v0.28.1
+	github.com/bwmarrin/discordgo v0.29.0
 	github.com/distrobyte/multielo v0.0.5
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
