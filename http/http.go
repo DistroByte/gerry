@@ -20,18 +20,11 @@ func initHTTPServer() {
 	r.Use(requestIDMiddleware)
 	r.Use(zerologMiddleware)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		// use the kartingHTML handler to serve the main page
-		kartingHTMLHandler(w, r)
-	})
-
 	r.Get("/health", healthHandler)
-	r.Get("/karting", kartingHTMLHandler)
-	r.Get("/karting.svg", kartingSVGHandler)
-	r.Get("/karting.png", kartingPNGHandler)
-	r.Get("/karting.json", kartingJSONHandler)
-	r.NotFound(notFoundHandler)
-	r.MethodNotAllowed(methodNotAllowedHandler)
+	
+	// Serve assets directory from root
+	// This allows direct access to files like /elo.html, /elo.png, /karting.json, etc.
+	r.Handle("/*", http.FileServer(http.Dir("assets")))
 
 	log.Info().Msgf("Starting server on port %d", config.GetHTTPPort())
 	log.Fatal().Err(http.ListenAndServe(fmt.Sprintf(":%d", config.GetHTTPPort()), r)).Msg("")
@@ -85,57 +78,4 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		hlog.FromRequest(r).Error().Err(err).Msg("")
 	}
-}
-
-func kartingHTMLHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		methodNotAllowedHandler(w, r)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	htmlContent := `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Karting SVG</title>
-    </head>
-    <body>
-        <object type="image/svg+xml" data="karting.svg"></object>
-    </body>
-    </html>`
-
-	_, err := w.Write([]byte(htmlContent))
-	if err != nil {
-		hlog.FromRequest(r).Error().Err(err).Msg("")
-	}
-}
-
-func kartingSVGHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "image/svg+xml")
-	http.ServeFile(w, r, "elo.svg")
-}
-
-func kartingPNGHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "image/png")
-	http.ServeFile(w, r, "elo.png")
-}
-
-func kartingJSONHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	http.ServeFile(w, r, "karting.json")
-}
-
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
-	_, err := w.Write([]byte("Not found"))
-	if err != nil {
-		hlog.FromRequest(r).Error().Err(err).Msg("")
-	}
-}
-
-func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusMethodNotAllowed)
 }

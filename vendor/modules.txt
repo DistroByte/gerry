@@ -1,5 +1,34 @@
-# git.sr.ht/~sbinet/gg v0.5.0
-## explicit; go 1.19
+# codeberg.org/go-fonts/liberation v0.5.0
+## explicit; go 1.23.0
+codeberg.org/go-fonts/liberation/liberationmonobold
+codeberg.org/go-fonts/liberation/liberationmonobolditalic
+codeberg.org/go-fonts/liberation/liberationmonoitalic
+codeberg.org/go-fonts/liberation/liberationmonoregular
+codeberg.org/go-fonts/liberation/liberationsansbold
+codeberg.org/go-fonts/liberation/liberationsansbolditalic
+codeberg.org/go-fonts/liberation/liberationsansitalic
+codeberg.org/go-fonts/liberation/liberationsansregular
+codeberg.org/go-fonts/liberation/liberationserifbold
+codeberg.org/go-fonts/liberation/liberationserifbolditalic
+codeberg.org/go-fonts/liberation/liberationserifitalic
+codeberg.org/go-fonts/liberation/liberationserifregular
+# codeberg.org/go-latex/latex v0.2.0
+## explicit; go 1.24
+codeberg.org/go-latex/latex
+codeberg.org/go-latex/latex/ast
+codeberg.org/go-latex/latex/drawtex
+codeberg.org/go-latex/latex/font
+codeberg.org/go-latex/latex/font/ttf
+codeberg.org/go-latex/latex/internal/tex2unicode
+codeberg.org/go-latex/latex/mtex
+codeberg.org/go-latex/latex/mtex/symbols
+codeberg.org/go-latex/latex/tex
+codeberg.org/go-latex/latex/token
+# codeberg.org/go-pdf/fpdf v0.11.1
+## explicit; go 1.21
+codeberg.org/go-pdf/fpdf
+# git.sr.ht/~sbinet/gg v0.7.0
+## explicit; go 1.24
 git.sr.ht/~sbinet/gg
 # github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 ## explicit; go 1.15
@@ -7,46 +36,15 @@ github.com/ajstarks/svgo
 # github.com/bwmarrin/discordgo v0.29.0
 ## explicit; go 1.13
 github.com/bwmarrin/discordgo
-# github.com/campoy/embedmd v1.0.0
-## explicit
-github.com/campoy/embedmd
-github.com/campoy/embedmd/embedmd
-# github.com/distrobyte/multielo v0.0.5
+# github.com/distrobyte/multielo v0.1.0
 ## explicit; go 1.23.0
 github.com/distrobyte/multielo
+github.com/distrobyte/multielo/domain
+github.com/distrobyte/multielo/infrastructure
 # github.com/go-chi/chi/v5 v5.2.3
 ## explicit; go 1.20
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
-# github.com/go-fonts/liberation v0.3.3
-## explicit; go 1.19
-github.com/go-fonts/liberation/liberationmonobold
-github.com/go-fonts/liberation/liberationmonobolditalic
-github.com/go-fonts/liberation/liberationmonoitalic
-github.com/go-fonts/liberation/liberationmonoregular
-github.com/go-fonts/liberation/liberationsansbold
-github.com/go-fonts/liberation/liberationsansbolditalic
-github.com/go-fonts/liberation/liberationsansitalic
-github.com/go-fonts/liberation/liberationsansregular
-github.com/go-fonts/liberation/liberationserifbold
-github.com/go-fonts/liberation/liberationserifbolditalic
-github.com/go-fonts/liberation/liberationserifitalic
-github.com/go-fonts/liberation/liberationserifregular
-# github.com/go-latex/latex v0.0.0-20240709081214-31cef3c7570e
-## explicit; go 1.21
-github.com/go-latex/latex
-github.com/go-latex/latex/ast
-github.com/go-latex/latex/drawtex
-github.com/go-latex/latex/font
-github.com/go-latex/latex/font/ttf
-github.com/go-latex/latex/internal/tex2unicode
-github.com/go-latex/latex/mtex
-github.com/go-latex/latex/mtex/symbols
-github.com/go-latex/latex/tex
-github.com/go-latex/latex/token
-# github.com/go-pdf/fpdf v0.9.0
-## explicit; go 1.20
-github.com/go-pdf/fpdf
 # github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 ## explicit
 github.com/golang/freetype/raster
@@ -73,9 +71,6 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
-# github.com/pmezard/go-difflib v1.0.0
-## explicit
-github.com/pmezard/go-difflib/difflib
 # github.com/rs/xid v1.6.0
 ## explicit; go 1.16
 github.com/rs/xid
@@ -99,8 +94,8 @@ golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/salsa20/salsa
-# golang.org/x/image v0.20.0
-## explicit; go 1.18
+# golang.org/x/image v0.34.0
+## explicit; go 1.24.0
 golang.org/x/image/ccitt
 golang.org/x/image/draw
 golang.org/x/image/font
@@ -120,15 +115,15 @@ golang.org/x/image/vector
 ## explicit; go 1.24.0
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
-# golang.org/x/text v0.31.0
+# golang.org/x/text v0.32.0
 ## explicit; go 1.24.0
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/internal
 golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/transform
-# gonum.org/v1/plot v0.14.0
-## explicit; go 1.20
+# gonum.org/v1/plot v0.16.0
+## explicit; go 1.23.0
 gonum.org/v1/plot
 gonum.org/v1/plot/font
 gonum.org/v1/plot/font/liberation
