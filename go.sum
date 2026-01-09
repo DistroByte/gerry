@@ -30,6 +30,8 @@ github.com/distrobyte/multielo v0.1.1 h1:vwzy8ZngIY/jdLyqSkBX7gTX2pwyL8SuCR4GRzz
 github.com/distrobyte/multielo v0.1.1/go.mod h1:svv+AlrisaP7pUZDaOAhEfUp16LlrJIelr7CueKrr8M=
 github.com/distrobyte/multielo v0.1.2 h1:71HTo5q6VzXpIVqbM79ARmLG6YqvbDSgHmTVg4gqVEM=
 github.com/distrobyte/multielo v0.1.2/go.mod h1:svv+AlrisaP7pUZDaOAhEfUp16LlrJIelr7CueKrr8M=
+github.com/distrobyte/multielo v0.1.3 h1:rqKrnTn7w4uS1MnQNtQNqC0vebU6OkHukjmu/3YnDLI=
+github.com/distrobyte/multielo v0.1.3/go.mod h1:svv+AlrisaP7pUZDaOAhEfUp16LlrJIelr7CueKrr8M=
 github.com/go-chi/chi/v5 v5.2.3 h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=
 github.com/go-chi/chi/v5 v5.2.3/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
