@@ -15,7 +15,6 @@ import (
 )
 
 var league *multielo.League
-var leagues *multielo.MultiLeagueService
 var longestPlayerName int
 
 // multielo -> zerolog adapter to surface logs from vendored module

@@ -36,7 +36,7 @@ github.com/ajstarks/svgo
 # github.com/bwmarrin/discordgo v0.29.0
 ## explicit; go 1.13
 github.com/bwmarrin/discordgo
-# github.com/distrobyte/multielo v0.1.1
+# github.com/distrobyte/multielo v0.1.2
 ## explicit; go 1.23.0
 github.com/distrobyte/multielo
 github.com/distrobyte/multielo/domain
