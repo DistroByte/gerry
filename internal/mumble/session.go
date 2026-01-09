@@ -50,6 +50,12 @@ func ReadyHandler(event *gumble.ConnectEvent) {
 		Msg("connected to mumble server")
 }
 
+func DisconnectHandler(event *gumble.DisconnectEvent) {
+	log.Warn().Msg("disconnected from mumble server, retrying connection...")
+
+	InitSession()
+}
+
 func MessageCreateHandler(event *gumble.TextMessageEvent) {
 	if event.Sender == nil || event.Sender.Name == "" {
 		return

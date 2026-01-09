@@ -6,6 +6,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/distrobyte/gerry/internal/config"
 	"github.com/distrobyte/gerry/internal/models"
@@ -14,6 +15,7 @@ import (
 )
 
 var league *multielo.League
+var leagues *multielo.MultiLeagueService
 var longestPlayerName int
 
 // multielo -> zerolog adapter to surface logs from vendored module
@@ -41,6 +43,7 @@ type persistedResult struct {
 
 type persistedMatch struct {
 	Results []persistedResult `json:"results"`
+	Date    time.Time         `json:"date"`
 }
 
 type persistedState struct {
@@ -236,7 +239,7 @@ func KartingRaceCommand(args []string, message models.Message) string {
 		})
 	}
 
-	err := league.AddMatch(results)
+	err := league.AddMatch(results, time.Now())
 	if err != nil {
 		return err.Error()
 	}
@@ -325,7 +328,7 @@ func save() error {
 		for _, r := range m.Results {
 			pr = append(pr, persistedResult{Position: r.Position, Player: r.Player.Name()})
 		}
-		pmatches = append(pmatches, persistedMatch{Results: pr})
+		pmatches = append(pmatches, persistedMatch{Results: pr, Date: m.Date})
 	}
 
 	state := persistedState{Players: pnames, Matches: pmatches}
@@ -427,7 +430,7 @@ func load() error {
 			}
 			results = append(results, &multielo.MatchResult{Position: r.Position, Player: player})
 		}
-		if err := league.AddMatch(results); err != nil {
+		if err := league.AddMatch(results, m.Date); err != nil {
 			log.Error().Err(err).Msg("failed to replay match from state")
 			return err
 		}
