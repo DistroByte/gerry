@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/distrobyte/multielo v0.1.3
-	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
 	github.com/rs/zerolog v1.34.0
@@ -31,7 +31,6 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
