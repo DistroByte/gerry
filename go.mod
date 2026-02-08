@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/distrobyte/multielo v0.1.3
-	github.com/go-chi/chi/v5 v5.2.4
+	github.com/go-chi/chi/v5 v5.2.5
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.6.0
 	github.com/rs/zerolog v1.34.0
