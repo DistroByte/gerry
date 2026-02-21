@@ -68,13 +68,13 @@ func MessageCreateHandler(event *gumble.TextMessageEvent) {
 
 	// replace special characters
 	for k, v := range specialChars {
-		event.TextMessage.Message = strings.ReplaceAll(event.TextMessage.Message, v, k)
+		event.Message = strings.ReplaceAll(event.Message, v, k)
 	}
 
 	message := &models.Message{
-		Content:  event.TextMessage.Message,
-		Author:   event.TextMessage.Sender.Name,
-		Channel:  strconv.FormatUint(uint64(event.TextMessage.Sender.Channel.ID), 10),
+		Content:  event.Message,
+		Author:   event.Sender.Name,
+		Channel:  strconv.FormatUint(uint64(event.Sender.Channel.ID), 10),
 		ID:       strconv.FormatInt(time.Now().UnixNano(), 10),
 		Platform: "mumble",
 	}

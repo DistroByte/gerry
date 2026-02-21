@@ -21,7 +21,7 @@ func initHTTPServer() {
 	r.Use(zerologMiddleware)
 
 	r.Get("/health", healthHandler)
-	
+
 	// Serve assets directory from root
 	// This allows direct access to files like /elo.html, /elo.png, /karting.json, etc.
 	r.Handle("/*", http.FileServer(http.Dir("assets")))
