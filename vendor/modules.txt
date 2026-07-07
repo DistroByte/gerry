@@ -41,7 +41,7 @@ github.com/bwmarrin/discordgo
 github.com/distrobyte/multielo
 github.com/distrobyte/multielo/domain
 github.com/distrobyte/multielo/infrastructure
-# github.com/go-chi/chi/v5 v5.3.0
+# github.com/go-chi/chi/v5 v5.3.1
 ## explicit; go 1.23
 github.com/go-chi/chi/v5
 github.com/go-chi/chi/v5/middleware
